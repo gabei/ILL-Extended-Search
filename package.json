@@ -2,11 +2,16 @@
   "name": "ill-extended-search",
   "version": "1.0.0",
   "description": "A web crawling helper app that aids in creating manual Interlibrary Loan Requests",
+  "type": "module",
   "main": "index.js",
   "git-repository": "https://github.com/gabei/ILL-Extended-Search",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Gabe Garcia",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "puppeteer": "^24.9.0"
+  }
 }
