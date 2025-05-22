@@ -1,19 +1,5 @@
 import puppeteer from 'puppeteer';
-import dotenv from 'dotenv';
-dotenv.config();
-
-
-// consider a separate config file
-const config = {
-    loginPage: process.env.ILL_LOGIN,
-    username: process.env.ILL_USERNAME,
-    password: process.env.ILL_PASSWORD,
-    usernameInput: "#username",
-    passwordInput: "#password",
-    requestPage: process.env.ILL_REQUEST_PAGE,
-    techAccount: process.env.TECH_ACCOUNT,
-};
-
+import { illConfig as config} from './config';
 
 const browser = await puppeteer.launch({headless: false});
 const page = await browser.newPage();
@@ -38,8 +24,8 @@ async function login() {
   await page.goto(config.loginPage);
   await printCurrentPageTitleAndURL();
 
-  await page.locator(config.usernameInput).fill(config.username);
-  await page.locator(config.passwordInput).fill(config.password);
+  await page.locator("#username").fill(config.username);
+  await page.locator("#password").fill(config.password);
   await page.locator('::-p-aria(Submit)').click();
   await page.waitForNavigation();
   await printCurrentPageTitleAndURL();
