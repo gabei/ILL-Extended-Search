@@ -8,8 +8,6 @@ page.setDefaultNavigationTimeout(10000); // 10 seconds
 
 
 
-
-
 // list of library names narrowed down to their text:
 // let names = document.querySelectorAll('ul[data-testid="holding-list-details"] li strong')
 // Array.from(names)
