@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 
-export const illConfig = {
+const illConfig  = {
     loginPage: process.env.ILL_LOGIN,
     username: process.env.ILL_USERNAME,
     password: process.env.ILL_PASSWORD,
@@ -12,8 +12,10 @@ export const illConfig = {
     techAccount: process.env.TECH_ACCOUNT,
 }
 
-export const worldCatConfig = {
+const worldCatConfig = {
   loginPage: process.env.WORLDCAT_LOGIN,
   username: process.env.WORLDCAT_USERNAME,
   password: process.env.WORLDCAT_PASSWORD,
 }
+
+export { illConfig, worldCatConfig };

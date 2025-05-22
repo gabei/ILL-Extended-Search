@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer';
-import { worldCatConfig as config} from './config';
+import { worldCatConfig as config} from './config.js';
 
 
 const browser = await puppeteer.launch({headless: false});

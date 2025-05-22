@@ -1,21 +1,28 @@
 import puppeteer from 'puppeteer';
-import { illConfig as config} from './config';
+import { illConfig as config } from './config.js';
+
+
 
 const browser = await puppeteer.launch({headless: false});
 const page = await browser.newPage();
 page.setDefaultNavigationTimeout(10000); // 10 seconds
 
 
-try {
-  await login();
-  await openBlankRequest(config.techAccount);
-} 
-catch(error) {
-  console.error("Error during login: ", error);
-} 
-finally {
-    await page.close();
-    await browser.close();
+
+export default async function init(){
+  console.log("Initializing...");
+
+  try {
+    await login();
+    await openBlankRequest(config.techAccount);
+  } 
+  catch(error) {
+    console.error("Error during login: ", error);
+  } 
+  finally {
+      await page.close();
+      await browser.close();
+  }
 }
 
 
