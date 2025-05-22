@@ -36,13 +36,13 @@ finally {
 
 async function login() { 
   await page.goto(config.loginPage);
-  printCurrentPageTitleAndURL();
+  await printCurrentPageTitleAndURL();
 
   await page.locator(config.usernameInput).fill(config.username);
   await page.locator(config.passwordInput).fill(config.password);
   await page.locator('::-p-aria(Submit)').click();
   await page.waitForNavigation();
-  printCurrentPageTitleAndURL();
+  await printCurrentPageTitleAndURL();
 }
 
 
@@ -51,15 +51,20 @@ async function openBlankRequest(patronID) {
   await page.goto(config.requestPage);
   printCurrentPageTitleAndURL();
 
-  let patronIDInput = await page.locator("#mat-input-1");
-  if (!patronIDInput)
-  await page.locator("#mat-input-1").fill(patronID);
+  await page.waitForSelector("#mat-input-0" || "#mat-input-1");
+  await page.locator("#mat-input-0" || "#mat-input-1").fill(patronID);
   await page.locator('button[type="submit"]').click();
 
-  // // wait for td to populate with patronID inside and then click on it
-  await page.locator(`:scope >>> ::-p-text(${patronID})`).click();
-  await page.waitForNavigation();
-  printCurrentPageTitleAndURL();
+  try {
+    await page.locator(`td  ::-p-text(${patronID})`).click();
+    
+  } catch(error) {
+    console.error("Error while clicking on the table cell: ", error);
+  } finally {
+    await page.waitForNavigation();
+  }
+  
+  
 }
 
 
