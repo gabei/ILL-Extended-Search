@@ -1,2 +1,4 @@
 import init from './login/ill-login.js';
-init();
+import initWorldCat from './login/worldcat-login.js';
+
+initWorldCat();

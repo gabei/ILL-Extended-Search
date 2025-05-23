@@ -2,13 +2,45 @@ import puppeteer from 'puppeteer';
 import { worldCatConfig as config} from './config.js';
 
 
+
 const browser = await puppeteer.launch({headless: false});
 const page = await browser.newPage();
 page.setDefaultNavigationTimeout(10000); // 10 seconds
 
 
 
-// navigate to email input page
+export default async function initWorldCat(){
+  try {
+    await enterEmail();
+    await login();
+  } 
+  catch(error){
+    console.error("There was an error during login: " + error.message);
+  } 
+  finally {
+    await page.close();
+    await browser.close();
+  }
+}
+
+
+
+async function enterEmail(){
+  console.log(process.env.WORLDCAT_LOGIN);
+  await page.goto(process.env.WORLDCAT_LOGIN);
+  await page.locator('input[type="text"]').fill(config.username);
+  await page.locator('button[type="Submit"]').click();
+  await page.waitForNavigation(60000);
+}
+
+
+
+async function login(){
+  await page.locator('input[type="text"]').fill(config.username);
+  await page.locator('input[type="password"]').fill(config.password);
+  await page.locator('button[type="Submit"]').click();
+  await page.waitForNavigation();
+}
 
 
 // on email input page

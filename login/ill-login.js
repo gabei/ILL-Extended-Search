@@ -9,7 +9,7 @@ page.setDefaultNavigationTimeout(10000); // 10 seconds
 
 
 
-export default async function init(){
+export default async function initILL(){
   console.log("Initializing...");
 
   try {
