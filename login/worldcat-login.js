@@ -77,6 +77,10 @@ async function login(){
 // let names = document.querySelectorAll('ul[data-testid="holding-list-details"] li strong')
 // Array.from(names)
 // this works in the console to single them into one HTML node list
+// example for console: 
+// names.forEach((node) => {
+//   console.log(node.innerText);
+// })
 
 
 // create that list of libraries in an array to search in the AGExternal json list
