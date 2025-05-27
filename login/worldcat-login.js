@@ -74,12 +74,11 @@ async function login(){
 // 
 
 // list of library names narrowed down to their text:
-// let names = document.querySelectorAll('ul[data-testid="holding-list-details"] li strong')
-// Array.from(names)
 // this works in the console to single them into one HTML node list
 // example for console: 
-// names.forEach((node) => {
-//   console.log(node.innerText);
+// let names = document.querySelectorAll('ul[data-testid="holding-list-details"] li strong')
+// let lst = Array.from(names).map((name) => {
+//   return name.innerText
 // })
 
 

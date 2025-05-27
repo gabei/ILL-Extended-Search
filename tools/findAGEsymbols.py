@@ -60,23 +60,34 @@ import json
 from thefuzz import fuzz
 from thefuzz import process
 
+
 file = open("TXlenders.json")
 data = json.load(file)
 
+
+def search_AG_list(city_name):
+  print(city_name)
+  for record in data:
+    if(record["LIBRARY NAME"] == city_name):
+      print(record["LIBRARY NAME"])
+      return record["AGEXTERNAL CODE"]
+
+
+AGExternal_list = [record["LIBRARY NAME"].upper() for record in data]
 search_results = []
 index = 0
 
+
 while(len(search_results) < 20):
-  potential_lender = data[index]["LIBRARY NAME"]
-  score = process.extractBests(potential_lender, searchable_libraries, limit=1)[0][1]
+  potential_lender = searchable_libraries[index].upper()
+  score = process.extractBests(potential_lender, AGExternal_list, limit=1)[0][1]
   if(score > 80):
-    print(potential_lender)
-    search_results.append(data[index]["AGEXTERNAL CODE"])
+    result = search_AG_list(potential_lender)
+    search_results.append(result)
   index += 1
 
 
 file.close()
-
 
 for code in search_results:
   print(code)
