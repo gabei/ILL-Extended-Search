@@ -1,5 +1,6 @@
 
 # this list is replaceable
+# populate this list from worldcat results based on book
 # use method from worldcat-login.js to grab this for now
 searchable_libraries = [
   "Georgetown Public Library",
