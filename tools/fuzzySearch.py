@@ -61,34 +61,36 @@ from thefuzz import fuzz
 from thefuzz import process
 
 
+
 file = open("TXlenders.json")
 data = json.load(file)
-
-
-def search_AG_list(city_name):
-  print(city_name)
-  for record in data:
-    if(record["LIBRARY NAME"] == city_name):
-      print(record["LIBRARY NAME"])
-      return record["AGEXTERNAL CODE"]
-
-
-AGExternal_list = [record["LIBRARY NAME"].upper() for record in data]
-search_results = []
-index = 0
-
-
-while(len(search_results) < 20):
-  potential_lender = searchable_libraries[index].upper()
-  score = process.extractBests(potential_lender, AGExternal_list, limit=1)[0][1]
-  if(score > 80):
-    result = search_AG_list(potential_lender)
-    search_results.append(result)
-  index += 1
-
-
 file.close()
 
-for code in search_results:
-  print(code)
 
+
+# had to rely on chat gpt a bit to clear this up for me. I get how it works but this is much clearner than my original solution was going to be!
+
+
+def normalize(name):
+  return name.lower()
+
+library_names = [normalize(entry["LIBRARY NAME"]) for entry in data]
+
+lender_codes = {
+  normalize(entry["LIBRARY NAME"]): entry["AGEXTERNAL CODE"]
+  for entry in data
+}
+
+SCORE_THRESHOLD = 85
+matches = []
+
+for name in searchable_libraries:
+  norm_name = normalize(name)
+  best_match, score = process.extractOne(norm_name, library_names, scorer=fuzz.ratio)
+
+  if score >= SCORE_THRESHOLD:
+    matches.append(lender_codes[best_match])
+
+
+for i in matches:
+  print(i)
