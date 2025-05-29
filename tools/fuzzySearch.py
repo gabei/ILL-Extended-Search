@@ -18,6 +18,12 @@ file.close()
 
 
 # had to rely on chat gpt a bit to clear this up for me. I get how it works but this is much clearner than my original solution was going to be!
+# need to make this more robust and add tests
+
+
+
+# when searching through ALLlenders.json, "AGEXTERNAL CODE" needs to be changed to "AGEXTERNAL SYMBOL"
+
 
 
 def normalize(name):
