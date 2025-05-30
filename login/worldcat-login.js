@@ -1,11 +1,22 @@
 import puppeteer from 'puppeteer';
 import { worldCatConfig as config} from './config.js';
+import { PuppeteerBlocker } from '@ghostery/adblocker-puppeteer';
+import fetch from 'cross-fetch';
 
 
 
 const browser = await puppeteer.launch({headless: false});
-const page = await browser.newPage();
-page.setDefaultNavigationTimeout(10000); // 10 seconds
+const page = (await browser.pages())[0] // use current tab
+page.setDefaultNavigationTimeout(60000); // 1 minute
+
+
+
+// setup adblock with Ghostery
+PuppeteerBlocker
+  .fromPrebuiltAdsAndTracking(fetch)
+  .then((blocker) => {
+    blocker.enableBlockingInPage(page);
+  })
 
 
 
@@ -26,11 +37,10 @@ export default async function initWorldCat(){
 
 
 async function enterEmail(){
-  console.log(process.env.WORLDCAT_LOGIN);
-  await page.goto(process.env.WORLDCAT_LOGIN);
+  await page.goto(config.loginPage);
   await page.locator('input[type="text"]').fill(config.username);
   await page.locator('button[type="Submit"]').click();
-  await page.waitForNavigation(60000);
+  await page.waitForNavigation();
 }
 
 

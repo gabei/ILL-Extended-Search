@@ -12,6 +12,7 @@
   "author": "Gabe Garcia",
   "license": "ISC",
   "dependencies": {
+    "@ghostery/adblocker-puppeteer": "^2.6.1",
     "dotenv": "^16.5.0",
     "puppeteer": "^24.9.0"
   }
