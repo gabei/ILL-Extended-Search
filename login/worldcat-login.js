@@ -67,9 +67,9 @@ async function login(){
 
 async function waitForCookieModalToClose(){
   // wait for modal to appear on screen
-  let modal = await page.waitForSelector('div.onetrust-pc-dark-filter', {timeout: 10000, visible: true});
-  if (!modal) throw new Error("Cookie modal not found");
-  console.log("Cookie modal found: " + modal);
+  // let modal = await page.waitForSelector('div.onetrust-pc-dark-filter', {timeout: 10000, visible: true});
+  // if (!modal) throw new Error("Cookie modal not found");
+  // console.log("Cookie modal found: " + modal);
 
   // wait for the reject cookies button to appear, then click it
   let selector = "#onetrust-reject-all-handler";
