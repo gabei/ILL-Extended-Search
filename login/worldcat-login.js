@@ -6,10 +6,15 @@ import fetch from 'cross-fetch';
 
 
 const browser = await puppeteer.launch({
+  args: [
+    '--incognito',
+  ],
   headless: false,
+  devtools: true,
 });
 const page = (await browser.pages())[0] // use current tab
 page.setDefaultNavigationTimeout(60000); // 1 minute
+page.setCacheEnabled(false);
 
 
 
@@ -43,7 +48,6 @@ export default async function initWorldCat(){
 
 async function goToEmailPage(){
    await page.goto(config.loginPage);
-   page.setCacheEnabled(false); // disable cache to avoid stale data
 }
 
 
@@ -73,7 +77,7 @@ async function waitForCookieModalToClose(){
     {},
     selector,
   );
-  
+
   if (!buttonReady) throw new Error("Reject cookies button not found");
   console.log("Cookies button found: " + selector);
 
