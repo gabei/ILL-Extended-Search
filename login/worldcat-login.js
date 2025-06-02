@@ -5,7 +5,9 @@ import fetch from 'cross-fetch';
 
 
 
-const browser = await puppeteer.launch({headless: false});
+const browser = await puppeteer.launch({
+  headless: false,
+});
 const page = (await browser.pages())[0] // use current tab
 page.setDefaultNavigationTimeout(60000); // 1 minute
 
@@ -22,8 +24,11 @@ PuppeteerBlocker
 
 export default async function initWorldCat(){
   try {
-    await enterEmail();
-    await login();
+    await goToEmailPage();
+    await waitForCookieModalToClose();
+    
+    //await enterEmail();
+    //await login();
   } 
   catch(error){
     console.error("There was an error during login: " + error.message);
@@ -36,8 +41,14 @@ export default async function initWorldCat(){
 
 
 
+async function goToEmailPage(){
+   await page.goto(config.loginPage);
+   page.setCacheEnabled(false); // disable cache to avoid stale data
+}
+
+
+
 async function enterEmail(){
-  await page.goto(config.loginPage);
   await page.locator('input[type="text"]').fill(config.username);
   await page.locator('button[type="Submit"]').click();
   await page.waitForNavigation();
@@ -51,6 +62,31 @@ async function login(){
   await page.locator('button[type="Submit"]').click();
   await page.waitForNavigation();
 }
+
+
+
+async function waitForCookieModalToClose(){
+  // wait for modal to appear on screen
+  let modal = await page.waitForSelector('div.onetrust-pc-dark-filter', {timeout: 10000, visible: true});
+  if (!modal) throw new Error("Cookie modal not found");
+  console.log("Cookie modal found: " + modal);
+
+  // wait for the reject cookies button to appear, then click it
+  let selector = "#onetrust-reject-all-handler";
+  let buttonReady = await page.waitForFunction(
+    selector => !!document.querySelector(selector),
+    {},
+    selector,
+  );
+  if (!buttonReady) throw new Error("Reject cookies button not found");
+  console.log("Cookies button found: " + selector);
+
+  if(buttonReady) await page.locator(selector).click();
+  await page.waitForNavigation();
+  console.log("Cookie modal should be closed now, proceeding to login...");
+}
+
+
 
 
 // on email input page
