@@ -42,9 +42,11 @@ export default async function initWorldCat(){
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     await inputLoginCredentials();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await handleLibraryLoadError();
     await expandLibraryHoldingsList();
-
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
   } 
+
   catch(error){
     console.error("There was an error during login: " + error.message);
   } 
@@ -87,6 +89,8 @@ async function landedOnSearchResultsPage(){
 
 async function expandLibraryHoldingsList(){
   let errorMessageDiv = page.locator('div[data-testid="holdings-error-notification-message"]');
+  console.log("Expanding library holdings list...");
+
 }
 
 
@@ -127,6 +131,35 @@ async function inputLoginCredentials(){
   await page.locator('input#username').fill(config.username);
   await page.locator('input#password').fill(config.password);
   await page.locator('button[type="Submit"]').click();
+}
+
+
+
+async function handleLibraryLoadError(){
+  // If the library holdings list fails to load, we need to tell the apge to retry
+  let errorMessageDiv = page.locator('div[data-testid="holdings-error-notification-message"]');
+  let retryButton = page.locator('div[data-testid="holdings-error-notification-message"] button');
+
+  let retryCount = 0;
+  let retry = setTimeout(async () => {
+        console.log("Retrying to load library holdings list...");
+        await handleLibraryLoadError();
+        retryCount++;
+    }, 1000);
+
+
+  if (errorMessageDiv) 
+  {
+    console.error("Holdings error notification message is visible. Retrying...");
+    await retryButton.click();
+    while( retryCount < 10) {
+      retry();
+    }
+  } 
+   else {
+    console.log("No holdings error notification message found. Continuing...");
+    if(retryCount) clearTimeout(retry);
+  }
 }
 
 
