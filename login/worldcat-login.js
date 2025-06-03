@@ -27,11 +27,16 @@ PuppeteerBlocker
 
 
 export default async function initWorldCat(){
-  try {
+  try 
+  {
     await goToSearchPage();
     await waitForCookieModalToClose();
-    await enterIsbnAndSearch("9780063411272");
-    await page.waitForNavigation();
+    await enterIsbnAndSearch("9780062060624");
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    
+    if(await landedOnSearchResultsPage()) await goToFirstSearchResult();
+    await expandLibraryHoldingsList();
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
   } 
   catch(error){
     console.error("There was an error during login: " + error.message);
@@ -54,11 +59,21 @@ async function enterIsbnAndSearch(isbn){
   try {
     await page.locator('input[type="text"]').fill(isbn);
     await page.locator('button[type="Submit"]').click();
-    await page.waitForNavigation();
   } catch (error) {
     console.error("Error during ISBN search: " + error.message);
     throw new Error("Error during ISBN search: " + error.message);; // rethrow to handle it in the main function
   }
+}
+
+
+
+async function landedOnSearchResultsPage(){
+  // It is possible to land on a search results page rather than the book page
+  // In that case, we should click on the top result
+  // Below we check if we are looking at a search results page
+  let searchResultItem = page.locator('li[data-testid="search-result-item"');
+  if(searchResultItem) return true;
+  return false;
 }
 
 
@@ -68,22 +83,36 @@ async function expandLibraryHoldingsList(){
 }
 
 
+async function goToFirstSearchResult(){
+  console.log("Landed on search results page. Waiting for search results to appear...");
+  let successfullyClicked = await waitForElementToAppearAndClick('h2 > div > a');
+  console.log("Successfully clicked on the first search result? " + successfullyClicked);
+  if(!successfullyClicked)  throw new Error("No search results found. Two things:\n 1.Are you sure the ISBN is correct?\n 2. Did you actually land on a search page?\n You are currently on: " + page.url())
+}
+
 
 async function waitForCookieModalToClose(){
   // wait for cookie button to appear and then click on it
   let selector = "#onetrust-reject-all-handler";
-  let buttonReady = await page.waitForFunction(
+  await waitForElementToAppearAndClick(selector);
+}
+
+
+
+async function waitForElementToAppearAndClick(selector) {
+  console.log(`Waiting for element with selector: ${selector}`);
+  let elementReady = await page.waitForFunction(
     selector => !!document.querySelector(selector),
     {},
     selector,
   );
 
-  if (!buttonReady) throw new Error("Reject cookies button not found");
-  console.log("Cookies button found: " + selector);
+  if (!elementReady) {
+    throw new Error(`Element with selector ${selector} not found`);
+  }
 
   await page.locator(selector).click();
-  //await page.waitForNavigation();
-  console.log("Cookie modal should be closed now, proceeding to login...");
+  return true;
 }
 
 
