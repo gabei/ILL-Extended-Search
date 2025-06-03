@@ -12,7 +12,7 @@ const browser = await puppeteer.launch({
   headless: false,
 });
 const page = (await browser.pages())[0] // use current tab
-page.setDefaultNavigationTimeout(10000); // 30 seconds
+page.setDefaultNavigationTimeout(10000); // 10 seconds
 page.setCacheEnabled(false);
 
 
@@ -35,8 +35,15 @@ export default async function initWorldCat(){
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     
     if(await landedOnSearchResultsPage()) await goToFirstSearchResult();
-    await expandLibraryHoldingsList();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
+
+    await goToSignInPage();
+    await inputEmail();
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await inputLoginCredentials();
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await expandLibraryHoldingsList();
+
   } 
   catch(error){
     console.error("There was an error during login: " + error.message);
@@ -99,12 +106,37 @@ async function waitForCookieModalToClose(){
 
 
 
+async function goToSignInPage(){
+  console.log("Attempting to navigate to sign-in page...");
+  let signInLinkFound = await waitForElementToAppearAndClick('a[data-testid="header-sign-in-link"]');
+  console.log("Sign-in link found and clicked: " + signInLinkFound);  
+}
+
+
+
+async function inputEmail(){
+    console.log("Attempting to input email...");
+    await page.locator('input[type="text"]').fill(config.username);
+    await page.locator('button[type="Submit"]').click();
+}
+
+
+
+async function inputLoginCredentials(){ 
+  console.log("Attempting to login using full credentials...");
+  await page.locator('input#username').fill(config.username);
+  await page.locator('input#password').fill(config.password);
+  await page.locator('button[type="Submit"]').click();
+}
+
+
+
 async function waitForElementToAppearAndClick(selector) {
   // See documentation for waitForFunction:
   // https://pptr.dev/api/puppeteer.page.waitforfunction
 
   console.log(`Waiting for element with selector: ${selector}`);
-  
+
   let elementReady = await page.waitForFunction(
     selector => !!document.querySelector(selector),
     {},
