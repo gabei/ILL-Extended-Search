@@ -100,7 +100,11 @@ async function waitForCookieModalToClose(){
 
 
 async function waitForElementToAppearAndClick(selector) {
+  // See documentation for waitForFunction:
+  // https://pptr.dev/api/puppeteer.page.waitforfunction
+
   console.log(`Waiting for element with selector: ${selector}`);
+  
   let elementReady = await page.waitForFunction(
     selector => !!document.querySelector(selector),
     {},
