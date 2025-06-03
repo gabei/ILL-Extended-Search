@@ -10,10 +10,9 @@ const browser = await puppeteer.launch({
     '--incognito',
   ],
   headless: false,
-  devtools: true,
 });
 const page = (await browser.pages())[0] // use current tab
-page.setDefaultNavigationTimeout(60000); // 1 minute
+page.setDefaultNavigationTimeout(10000); // 30 seconds
 page.setCacheEnabled(false);
 
 
@@ -29,11 +28,10 @@ PuppeteerBlocker
 
 export default async function initWorldCat(){
   try {
-    await goToEmailPage();
+    await goToSearchPage();
     await waitForCookieModalToClose();
-    
-    //await enterEmail();
-    //await login();
+    await enterIsbnAndSearch("9780063411272");
+    await page.waitForNavigation();
   } 
   catch(error){
     console.error("There was an error during login: " + error.message);
@@ -46,25 +44,27 @@ export default async function initWorldCat(){
 
 
 
-async function goToEmailPage(){
-   await page.goto(config.loginPage);
+async function goToSearchPage(){
+   await page.goto(config.searchPage);
 }
 
 
 
-async function enterEmail(){
-  await page.locator('input[type="text"]').fill(config.username);
-  await page.locator('button[type="Submit"]').click();
-  await page.waitForNavigation();
+async function enterIsbnAndSearch(isbn){
+  try {
+    await page.locator('input[type="text"]').fill(isbn);
+    await page.locator('button[type="Submit"]').click();
+    await page.waitForNavigation();
+  } catch (error) {
+    console.error("Error during ISBN search: " + error.message);
+    throw new Error("Error during ISBN search: " + error.message);; // rethrow to handle it in the main function
+  }
 }
 
 
 
-async function login(){
-  await page.locator('input[type="text"]').fill(config.username);
-  await page.locator('input[type="password"]').fill(config.password);
-  await page.locator('button[type="Submit"]').click();
-  await page.waitForNavigation();
+async function expandLibraryHoldingsList(){
+  let errorMessageDiv = page.locator('div[data-testid="holdings-error-notification-message"]');
 }
 
 
@@ -82,7 +82,7 @@ async function waitForCookieModalToClose(){
   console.log("Cookies button found: " + selector);
 
   await page.locator(selector).click();
-  await page.waitForNavigation();
+  //await page.waitForNavigation();
   console.log("Cookie modal should be closed now, proceeding to login...");
 }
 

@@ -2,7 +2,18 @@
 # this list is replaceable
 # populate this list from worldcat results based on book
 # use method from worldcat-login.js to grab this for now
-searchable_libraries = []
+searchable_libraries = [
+  "Waco-McLennan County Library",
+  "Montgomery County Memorial Library System",
+  "Houston Public Library",
+  "Harris County Public Library",
+  "Tom Green County Library System",
+  "Fort Worth Public Library",
+  "Brazoria County Library System - ILL",
+  "Irving Public Library",
+  "Corpus Christi Public Library",
+  "Southern Prairie Library System"
+]
 
 # begin work here
 import json
@@ -11,7 +22,7 @@ from thefuzz import process
 
 
 
-file = open("TXlenders.json")
+file = open("Alllenders.json")
 data = json.load(file)
 file.close()
 
@@ -32,7 +43,7 @@ def normalize(name):
 library_names = [normalize(entry["LIBRARY NAME"]) for entry in data]
 
 lender_codes = {
-  normalize(entry["LIBRARY NAME"]): entry["AGEXTERNAL CODE"]
+  normalize(entry["LIBRARY NAME"]): entry["AGEXTERNAL CODE "]
   for entry in data
 }
 

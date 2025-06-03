@@ -12,7 +12,7 @@ const illConfig  = {
 }
 
 const worldCatConfig = {
-  homePage: process.env.WORLDCAT_HOME,
+  searchPage: process.env.WORLDCAT_HOME,
   loginPage: process.env.WORLDCAT_LOGIN,
   username: process.env.WORLDCAT_USERNAME,
   password: process.env.WORLDCAT_PASSWORD,
