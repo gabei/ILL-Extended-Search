@@ -12,7 +12,7 @@ const browser = await puppeteer.launch({
   headless: false,
 });
 const page = (await browser.pages())[0] // use current tab
-page.setDefaultNavigationTimeout(10000); // 10 seconds
+page.setDefaultNavigationTimeout(60000); // 10 seconds
 page.setCacheEnabled(false);
 
 
@@ -140,26 +140,13 @@ async function handleLibraryLoadError(){
   let errorMessageDiv = page.locator('div[data-testid="holdings-error-notification-message"]');
   let retryButton = page.locator('div[data-testid="holdings-error-notification-message"] button');
 
-  let retryCount = 0;
-  let retry = setTimeout(async () => {
-        console.log("Retrying to load library holdings list...");
-        await handleLibraryLoadError();
-        retryCount++;
-    }, 1000);
-
-
-  if (errorMessageDiv) 
-  {
-    console.error("Holdings error notification message is visible. Retrying...");
+  if ( errorMessageDiv ){
     await retryButton.click();
-    while( retryCount < 10) {
-      retry();
-    }
+    setTimeout(async () => {
+      console.log("Retrying to load library holdings list...");
+      await handleLibraryLoadError();
+    }, 1000);
   } 
-   else {
-    console.log("No holdings error notification message found. Continuing...");
-    if(retryCount) clearTimeout(retry);
-  }
 }
 
 
