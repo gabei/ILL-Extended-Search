@@ -135,20 +135,46 @@ async function inputLoginCredentials(){
 
 
 
-async function handleLibraryLoadError(){
-  // If the library holdings list fails to load, we need to tell the apge to retry
-  let errorMessageDiv = page.locator('div[data-testid="holdings-error-notification-message"]');
-  let retryButton = page.locator('div[data-testid="holdings-error-notification-message"] button');
+async function elementExists(divSelector) {
+  const exists = 
+  await page.$(divSelector, () =>{
+    return true
+  }).catch(() => {
+    return false
+  });
 
-  if ( errorMessageDiv ){
-    await retryButton.click();
-    setTimeout(async () => {
-      console.log("Retrying to load library holdings list...");
-      await handleLibraryLoadError();
-    }, 1000);
-  } 
+  return exists
 }
 
+
+
+async function waitFor(time){
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
+
+
+async function handleLibraryLoadError(){
+  let errorDivSelector = 'div[data-testid="holdings-error-notification-message"]';
+  let errorMessageButton = page.locator('div[data-testid="holdings-error-notification-message"] button');
+  let errorShows = await elementExists(errorDivSelector);
+  let clickErrorMessageButton = await waitForElementToAppearAndClick(errorMessageButton);
+  let waitOptions = {concurrency: 2, idleTime: 1000}
+
+  // If the library holdings list fails to load, we need to tell the page to reload
+  if ( errorShows ) {
+      await clickErrorMessageButton();
+      await waitFor(2000);
+
+      if( errorShows ){
+        await page.reload();
+        await page.waitForNavigation();
+        await handleLibraryLoadError();
+      }  
+  } else {
+    return true
+  }
+}
 
 
 async function waitForElementToAppearAndClick(selector) {
