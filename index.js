@@ -1,4 +1,4 @@
 
-import initWorldCat from './login/worldcat-login.js';
+import initRebrowserBotTest from './login/rebrowserBotTest.js';
 
-initWorldCat();
+initRebrowserBotTest();
