@@ -5,24 +5,32 @@ import fetch from 'cross-fetch';
 
 
 
-const browser = await puppeteer.launch({
+const browserOptions = {
+  defaultViewport: null,
+  headless: false,
   args: [
     '--incognito',
+    '--disable-web-security',
+    '--disable-features=IsolateOrigins,site-per-process',
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-blink-features=AutomationControlled',
   ],
-  headless: false,
-});
-const page = (await browser.pages())[0] // use current tab
-page.setDefaultNavigationTimeout(60000); // 10 seconds
-page.setCacheEnabled(false);
+}
 
 
+const browser = await puppeteer.launch(browserOptions);
+  const page = (await browser.pages())[0] // use current tab
+  page.setDefaultNavigationTimeout(60000); // 10 seconds
+  page.setCacheEnabled(false);
 
-// setup adblock with Ghostery
-PuppeteerBlocker
-  .fromPrebuiltAdsAndTracking(fetch)
-  .then((blocker) => {
-    blocker.enableBlockingInPage(page);
-  })
+  // setup adblock with Ghostery
+  PuppeteerBlocker
+    .fromPrebuiltAdsAndTracking(fetch)
+    .then((blocker) => {
+      blocker.enableBlockingInPage(page);
+    })
 
 
 
