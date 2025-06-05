@@ -54,7 +54,10 @@ export default async function initWorldCat(){
     await handleLibraryLoadError();
     await waitFor(1000);
     await expandLibraryHoldingsList();
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await waitFor(3000);
+    const names = await getListOfLibraryNames();
+    printLibraryNames(names);
+    
   } 
 
   catch(error){
@@ -209,6 +212,26 @@ async function waitForElementToAppearAndClick(selector, maxWaitTime = 5000) {
 
 
 
+async function getListOfLibraryNames(){
+  return await page.evaluate(()=> {
+    // This function will return a list of library names from the holdings list
+    let names = document.querySelectorAll('ul[data-testid="holding-list-details"] li strong');
+    console.log(names);
+    return Array.from(names).map((name) => name.innerText);
+  });
+}
+
+
+
+function printLibraryNames(names){
+  console.log("List of library names:");
+  names.forEach((name) => {
+    console.log(name);
+  });
+}
+
+
+
 async function elementExists(divSelector) {
   const exists = 
   await page.$(divSelector, () =>{
@@ -225,6 +248,9 @@ async function elementExists(divSelector) {
 async function waitFor(time){
   return new Promise(resolve => setTimeout(resolve, time));
 }
+
+
+
 
 
 
