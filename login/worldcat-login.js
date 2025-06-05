@@ -182,24 +182,29 @@ async function expandLibraryHoldingsList(){
 }
 
 
-async function waitForElementToAppearAndClick(selector) {
+async function waitForElementToAppearAndClick(selector, maxWaitTime = 5000) {
   // See documentation for waitForFunction:
   // https://pptr.dev/api/puppeteer.page.waitforfunction
 
   console.log(`Waiting for element with selector: ${selector}`);
 
   let elementReady = await page.waitForFunction(
-    selector => !!document.querySelector(selector),
-    {},
-    selector,
+      selector => !!document.querySelector(selector),
+      {signal: AbortSignal.timeout(maxWaitTime)},
+      selector,
+  ).catch((error) => {
+      console.error(`Error waiting for element with selector ${selector}:`, error)
+      return false;
+    } 
   );
-
-  if (!elementReady) {
-    throw new Error(`Element with selector ${selector} not found`);
+  
+  if(elementReady) {
+    await page.locator(selector).click();
+    return true;
+  } else {
+    return false;
   }
-
-  await page.locator(selector).click();
-  return true;
+  
 }
 
 
