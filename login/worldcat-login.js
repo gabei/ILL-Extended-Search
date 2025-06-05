@@ -5,24 +5,32 @@ import fetch from 'cross-fetch';
 
 
 
-const browser = await puppeteer.launch({
+const browserOptions = {
+  defaultViewport: null,
+  headless: false,
   args: [
     '--incognito',
+    '--disable-web-security',
+    '--disable-features=IsolateOrigins,site-per-process',
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-blink-features=AutomationControlled',
   ],
-  headless: false,
-});
-const page = (await browser.pages())[0] // use current tab
-page.setDefaultNavigationTimeout(60000); // 10 seconds
-page.setCacheEnabled(false);
+}
 
 
+const browser = await puppeteer.launch(browserOptions);
+  const page = (await browser.pages())[0] // use current tab
+  page.setDefaultNavigationTimeout(60000); // 10 seconds
+  page.setCacheEnabled(false);
 
-// setup adblock with Ghostery
-PuppeteerBlocker
-  .fromPrebuiltAdsAndTracking(fetch)
-  .then((blocker) => {
-    blocker.enableBlockingInPage(page);
-  })
+  // setup adblock with Ghostery
+  PuppeteerBlocker
+    .fromPrebuiltAdsAndTracking(fetch)
+    .then((blocker) => {
+      blocker.enableBlockingInPage(page);
+    })
 
 
 
@@ -38,13 +46,18 @@ export default async function initWorldCat(){
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
 
     await goToSignInPage();
+    await page.waitForNavigation();
     await inputEmail();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     await inputLoginCredentials();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     await handleLibraryLoadError();
+    await waitFor(1000);
     await expandLibraryHoldingsList();
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await waitFor(3000);
+    const names = await getListOfLibraryNames();
+    printLibraryNames(names);
+    
   } 
 
   catch(error){
@@ -87,19 +100,13 @@ async function landedOnSearchResultsPage(){
 
 
 
-async function expandLibraryHoldingsList(){
-  let errorMessageDiv = page.locator('div[data-testid="holdings-error-notification-message"]');
-  console.log("Expanding library holdings list...");
-
-}
-
-
 async function goToFirstSearchResult(){
   console.log("Landed on search results page. Waiting for search results to appear...");
   let successfullyClicked = await waitForElementToAppearAndClick('h2 > div > a');
   console.log("Successfully clicked on the first search result? " + successfullyClicked);
   if(!successfullyClicked)  throw new Error("No search results found. Two things:\n 1.Are you sure the ISBN is correct?\n 2. Did you actually land on a search page?\n You are currently on: " + page.url())
 }
+
 
 
 async function waitForCookieModalToClose(){
@@ -135,6 +142,96 @@ async function inputLoginCredentials(){
 
 
 
+async function handleLibraryLoadError(){
+  let errorDivSelector = 'div[data-testid="holdings-error-notification-message"]';
+  let errorMessageButton = page.locator('div[data-testid="holdings-error-notification-message"] button');
+  let errorShows = await elementExists(errorDivSelector);
+  let clickErrorMessageButton = await waitForElementToAppearAndClick(errorMessageButton);
+
+  // If the library holdings list fails to load, we need to tell the page to reload
+  if ( errorShows ) {
+      await clickErrorMessageButton();
+      await waitFor(2000);
+
+      if( errorShows ){
+        await page.reload();
+        await page.waitForNavigation();
+        await handleLibraryLoadError();
+      }  
+  } else {
+    console.log("No error messages shown for library holdings list. Proceeding...");
+    return true;
+  }
+}
+
+
+
+async function expandLibraryHoldingsList(){
+  console.log("Attempting to expand library holdings list...");
+
+  // Wait for the library holdings list to appear
+  const paginationExtenderSelector = 'div[data-testid="pagination-results-per-page"] input';
+  let selectionsVisible = await waitForElementToAppearAndClick(paginationExtenderSelector);
+  if (selectionsVisible) {
+    console.log("Selections for pagination results per page are visible.");
+  }
+
+  // Select 50 results per page
+  const expandedListselector = 'li[data-testid="pagination-limit-select-50"]';
+  let listingsExpanded = await waitForElementToAppearAndClick(expandedListselector);
+  if(listingsExpanded) {
+    console.log("Library holdings list expanded to 50 results per page.");
+  }
+}
+
+
+async function waitForElementToAppearAndClick(selector, maxWaitTime = 5000) {
+  // See documentation for waitForFunction:
+  // https://pptr.dev/api/puppeteer.page.waitforfunction
+
+  console.log(`Waiting for element with selector: ${selector}`);
+
+  let elementReady = await page.waitForFunction(
+      selector => !!document.querySelector(selector),
+      {signal: AbortSignal.timeout(maxWaitTime)},
+      selector,
+  ).catch((error) => {
+      console.error(`Error waiting for element with selector ${selector}:`, error)
+      return false;
+    } 
+  );
+  
+  if(elementReady) {
+    await page.locator(selector).click();
+    return true;
+  } else {
+    return false;
+  }
+  
+}
+
+
+
+async function getListOfLibraryNames(){
+  return await page.evaluate(()=> {
+    // This function will return a list of library names from the holdings list
+    let names = document.querySelectorAll('ul[data-testid="holding-list-details"] li strong');
+    console.log(names);
+    return Array.from(names).map((name) => name.innerText);
+  });
+}
+
+
+
+function printLibraryNames(names){
+  console.log("List of library names:");
+  names.forEach((name) => {
+    console.log(name);
+  });
+}
+
+
+
 async function elementExists(divSelector) {
   const exists = 
   await page.$(divSelector, () =>{
@@ -154,81 +251,8 @@ async function waitFor(time){
 
 
 
-async function handleLibraryLoadError(){
-  let errorDivSelector = 'div[data-testid="holdings-error-notification-message"]';
-  let errorMessageButton = page.locator('div[data-testid="holdings-error-notification-message"] button');
-  let errorShows = await elementExists(errorDivSelector);
-  let clickErrorMessageButton = await waitForElementToAppearAndClick(errorMessageButton);
-  let waitOptions = {concurrency: 2, idleTime: 1000}
-
-  // If the library holdings list fails to load, we need to tell the page to reload
-  if ( errorShows ) {
-      await clickErrorMessageButton();
-      await waitFor(2000);
-
-      if( errorShows ){
-        await page.reload();
-        await page.waitForNavigation();
-        await handleLibraryLoadError();
-      }  
-  } else {
-    return true
-  }
-}
 
 
-async function waitForElementToAppearAndClick(selector) {
-  // See documentation for waitForFunction:
-  // https://pptr.dev/api/puppeteer.page.waitforfunction
-
-  console.log(`Waiting for element with selector: ${selector}`);
-
-  let elementReady = await page.waitForFunction(
-    selector => !!document.querySelector(selector),
-    {},
-    selector,
-  );
-
-  if (!elementReady) {
-    throw new Error(`Element with selector ${selector} not found`);
-  }
-
-  await page.locator(selector).click();
-  return true;
-}
-
-
-
-
-// on email input page
-// select input type="text" and fill with worldcat username
-// select button type=submit and click 
-// (this takes us to the actual login page)
-
-
-// on login page
-// select input type="text" again and fill with worldcat username
-// select input type="password" and fill with password
-// select button type=submit and click 
-// *may need to retry after 403 from WorldCat?
-
-
-// on main search page
-// select input id="home-page-search-box" and fill with ISBN
-// select button type=submit and click 
-
-
-// on search results page
-// select first h2 > a and click
-
-
-// on book page
-// select button with text "All libraries"
-// select li with data-value="50" and click
-// wait
-//  if div with data-testid="holdings-error-notification-message"
-//    restart process
-// 
 
 // list of library names narrowed down to their text:
 // this works in the console to single them into one HTML node list
@@ -237,6 +261,3 @@ async function waitForElementToAppearAndClick(selector) {
 // let lst = Array.from(names).map((name) => {
 //   return name.innerText
 // })
-
-
-// create that list of libraries in an array to search in the AGExternal json list

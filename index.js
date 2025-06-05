@@ -1,4 +1,3 @@
-
-import initWorldCat from './login/worldcat-login.js';
+import initWorldCat  from "./login/worldcat-login.js";
 
 initWorldCat();
