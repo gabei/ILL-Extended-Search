@@ -46,11 +46,13 @@ export default async function initWorldCat(){
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
 
     await goToSignInPage();
+    await page.waitForNavigation();
     await inputEmail();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     await inputLoginCredentials();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     await handleLibraryLoadError();
+    await waitFor(1000);
     await expandLibraryHoldingsList();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
   } 
@@ -95,19 +97,13 @@ async function landedOnSearchResultsPage(){
 
 
 
-async function expandLibraryHoldingsList(){
-  let errorMessageDiv = page.locator('div[data-testid="holdings-error-notification-message"]');
-  console.log("Expanding library holdings list...");
-
-}
-
-
 async function goToFirstSearchResult(){
   console.log("Landed on search results page. Waiting for search results to appear...");
   let successfullyClicked = await waitForElementToAppearAndClick('h2 > div > a');
   console.log("Successfully clicked on the first search result? " + successfullyClicked);
   if(!successfullyClicked)  throw new Error("No search results found. Two things:\n 1.Are you sure the ISBN is correct?\n 2. Did you actually land on a search page?\n You are currently on: " + page.url())
 }
+
 
 
 async function waitForCookieModalToClose(){
@@ -143,6 +139,80 @@ async function inputLoginCredentials(){
 
 
 
+async function handleLibraryLoadError(){
+  let errorDivSelector = 'div[data-testid="holdings-error-notification-message"]';
+  let errorMessageButton = page.locator('div[data-testid="holdings-error-notification-message"] button');
+  let errorShows = await elementExists(errorDivSelector);
+  let clickErrorMessageButton = await waitForElementToAppearAndClick(errorMessageButton);
+
+  // If the library holdings list fails to load, we need to tell the page to reload
+  if ( errorShows ) {
+      await clickErrorMessageButton();
+      await waitFor(2000);
+
+      if( errorShows ){
+        await page.reload();
+        await page.waitForNavigation();
+        await handleLibraryLoadError();
+      }  
+  } else {
+    console.log("No error messages shown for library holdings list. Proceeding...");
+    return true;
+  }
+}
+
+
+
+async function expandLibraryHoldingsList(){
+  console.log("Attempting to expand library holdings list...");
+
+  // Wait for the library holdings list to appear
+  const paginationExtenderSelector = 'div[data-testid="pagination-results-per-page"] input';
+  let selectionsVisible = await waitForElementToAppearAndClick(paginationExtenderSelector);
+  if (selectionsVisible) {
+    console.log("Selections for pagination results per page are visible.");
+  }
+
+  // Select 50 results per page
+  const expandedListselector = 'li[data-testid="pagination-limit-select-50"]';
+  let listingsExpanded = await waitForElementToAppearAndClick(expandedListselector);
+  if(listingsExpanded) {
+    console.log("Library holdings list expanded to 50 results per page.");
+  }
+}
+
+
+async function waitForElementToAppearAndClick(selector) {
+  // See documentation for waitForFunction:
+  // https://pptr.dev/api/puppeteer.page.waitforfunction
+  console.log(`Waiting for element with selector: ${selector}`);
+
+  let waitForElement = await page.waitForFunction(
+    selector => !!document.querySelector(selector),
+    {timeout: 3000}, // no timeout - handle this elsewhere
+    selector,
+  );
+
+  let elementReady = new Promise((resolve, reject) => {
+    if (waitForElement) {
+      console.log(`Element with selector ${selector} is ready.`);
+      return resolve(true);
+    } else {
+      console.error(`Error waiting for element with selector ${selector}: `, error)
+      return reject(false);
+    }
+  })
+
+  if(await elementReady){
+    await page.locator(selector).click();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+
 async function elementExists(divSelector) {
   const exists = 
   await page.$(divSelector, () =>{
@@ -158,51 +228,6 @@ async function elementExists(divSelector) {
 
 async function waitFor(time){
   return new Promise(resolve => setTimeout(resolve, time));
-}
-
-
-
-async function handleLibraryLoadError(){
-  let errorDivSelector = 'div[data-testid="holdings-error-notification-message"]';
-  let errorMessageButton = page.locator('div[data-testid="holdings-error-notification-message"] button');
-  let errorShows = await elementExists(errorDivSelector);
-  let clickErrorMessageButton = await waitForElementToAppearAndClick(errorMessageButton);
-  let waitOptions = {concurrency: 2, idleTime: 1000}
-
-  // If the library holdings list fails to load, we need to tell the page to reload
-  if ( errorShows ) {
-      await clickErrorMessageButton();
-      await waitFor(2000);
-
-      if( errorShows ){
-        await page.reload();
-        await page.waitForNavigation();
-        await handleLibraryLoadError();
-      }  
-  } else {
-    return true
-  }
-}
-
-
-async function waitForElementToAppearAndClick(selector) {
-  // See documentation for waitForFunction:
-  // https://pptr.dev/api/puppeteer.page.waitforfunction
-
-  console.log(`Waiting for element with selector: ${selector}`);
-
-  let elementReady = await page.waitForFunction(
-    selector => !!document.querySelector(selector),
-    {},
-    selector,
-  );
-
-  if (!elementReady) {
-    throw new Error(`Element with selector ${selector} not found`);
-  }
-
-  await page.locator(selector).click();
-  return true;
 }
 
 
