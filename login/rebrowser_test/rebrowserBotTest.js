@@ -1,19 +1,8 @@
 import puppeteer, { executablePath } from 'puppeteer';
+import { browserOptions } from '../config';
+
 
 const botDetectorUrl = "https://bot-detector.rebrowser.net/";
-const botOptions = {
-  defaultViewport: null,
-  headless: false,
-  args: [
-    '--incognito',
-    '--disable-web-security',
-    '--disable-features=IsolateOrigins,site-per-process',
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-    '--disable-dev-shm-usage',
-    '--disable-blink-features=AutomationControlled',
-  ],
-}
 
 
 import userAgentList from '../userAgents.json' with { type: 'json' };
@@ -26,7 +15,7 @@ async function getRandomUserAgent(){
 
 export default async function initRebrowserBotTest() {
   console.log("Initializing Rebrowser Bot Test...");
-  const browser = await puppeteer.launch(botOptions);
+  const browser = await puppeteer.launch(browserOptions);
   const page = (await browser.pages())[0];
   page.setCacheEnabled(false);
   page.setUserAgent(await getRandomUserAgent());
@@ -34,9 +23,6 @@ export default async function initRebrowserBotTest() {
 
 
   
-
-
-
   try {
     await page.goto(botDetectorUrl);
     await page.waitForNavigation();

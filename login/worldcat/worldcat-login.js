@@ -22,20 +22,12 @@ const browser = await puppeteer.launch(browserOptions);
 export default async function initWorldCat(){
   try 
   {
-    await goToSearchPage();
-    await waitForCookieModalToClose();
-    await enterIsbnAndSearch("9780970867100");
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await goToMainSearchPageAndAttemptSearch("9780970867100");
     
-    if(await landedOnSearchResultsPage()) await goToFirstSearchResult();
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    let currentlyOnSearchPage = await landedOnSearchResultsPage();
+    if(currentlyOnSearchPage) await goToFirstSearchResult();
 
-    await goToSignInPage();
-    await page.waitForNavigation();
-    await inputEmail();
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
-    await inputLoginCredentials();
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await attemptToLogin();
     await handleLibraryLoadError();
     await waitFor(1000);
     await expandLibraryHoldingsList();
@@ -55,8 +47,32 @@ export default async function initWorldCat(){
 
 
 
+async function goToMainSearchPageAndAttemptSearch(isbn){
+  try {
+    await goToSearchPage();
+    await waitForCookieModalToClose();
+    await enterIsbnAndSearch(isbn);
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+  }
+
+  catch (error) {
+    console.error("Error during initial ISBN search: " + error.message);
+    throw new Error("Error during initial ISBN search: " + error.message);
+  }   
+}
+
+
+
 async function goToSearchPage(){
    await page.goto(config.searchPage);
+}
+
+
+
+async function waitForCookieModalToClose(){
+  // wait for cookie button to appear and then click on it
+  let selector = "#onetrust-reject-all-handler";
+  await waitForElementToAppearAndClick(selector);
 }
 
 
@@ -86,17 +102,42 @@ async function landedOnSearchResultsPage(){
 
 async function goToFirstSearchResult(){
   console.log("Landed on search results page. Waiting for search results to appear...");
-  let successfullyClicked = await waitForElementToAppearAndClick('h2 > div > a');
-  console.log("Successfully clicked on the first search result? " + successfullyClicked);
-  if(!successfullyClicked)  throw new Error("No search results found. Two things:\n 1.Are you sure the ISBN is correct?\n 2. Did you actually land on a search page?\n You are currently on: " + page.url())
+
+  try {
+    let successfullyClicked = await waitForElementToAppearAndClick('h2 > div > a');
+    if(!successfullyClicked) {
+      console.log(
+        "No search results found. Proceeding with script.\nIf this is a mistake, there are two things to consider:\n 1.Are you sure the ISBN is correct?\n 2. Did you actually land on a search page?\n You are currently on: " + page.url()
+      )
+
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  catch (error) {
+    console.error("Error while trying to click on the first search result: " + error.message);
+    throw new Error("Error while trying to click on the first search result: " + error.message);
+
+  }
 }
 
 
+async function attemptToLogin(){
+  try {
+    await goToSignInPage();
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await inputEmail();
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await inputLoginCredentials();
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+  }
 
-async function waitForCookieModalToClose(){
-  // wait for cookie button to appear and then click on it
-  let selector = "#onetrust-reject-all-handler";
-  await waitForElementToAppearAndClick(selector);
+  catch (error) {
+    console.error("Error during login: " + error.message);
+    throw new Error("Error during login: " + error.message);
+  }
 }
 
 
@@ -180,7 +221,7 @@ async function waitForElementToAppearAndClick(selector, maxWaitTime = 5000) {
       {signal: AbortSignal.timeout(maxWaitTime)},
       selector,
   ).catch((error) => {
-      console.error(`Error waiting for element with selector ${selector}:`, error)
+      console.error(`Error waiting for element with selector ${selector}:`, error + "\n Proceeding if possible...");
       return false;
     } 
   );
@@ -232,16 +273,3 @@ async function elementExists(divSelector) {
 async function waitFor(time){
   return new Promise(resolve => setTimeout(resolve, time));
 }
-
-
-
-
-
-
-// list of library names narrowed down to their text:
-// this works in the console to single them into one HTML node list
-// example for console: 
-// let names = document.querySelectorAll('ul[data-testid="holding-list-details"] li strong')
-// let lst = Array.from(names).map((name) => {
-//   return name.innerText
-// })
