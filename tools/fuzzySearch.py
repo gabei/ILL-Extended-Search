@@ -3,19 +3,28 @@
 # populate this list from worldcat results based on book
 # use method from worldcat-login.js to grab this for now
 searchable_libraries = [
-  "Beatrice Public Library",
-  "East Alton Public Library District",
-  "Northlake Public Library District",
-  "Oak Park Public Library",
-  "Allen County Public Library",
-  "Michigan State University Libraries",
-  "Onondaga County Public Library",
-  "Asbury Park Public Library",
-  "Richland Public Library",
-  "North East Lincolnshire Libraries",
-  "London Borough of Hounslow Libraries",
-  "Suffolk Community Libraries",
-  "Danish Union Catalogue and Danish National Bibliography"
+  'Ardmore Public Library',
+  'Springfield-Greene County Library District',
+  'Mid-Continent Public Library',
+  'Falls City Library and Arts Center',
+  'Saint Louis Public Library',
+  'Henderson County Public Library District',
+  'Johnson County Public Library',
+  'Carnegie Stout Public Library',
+  'Allen County Public Library',
+  'Hennepin County Library',
+  'K.O. Lee Aberdeen Public Library',
+  'Stark County District Library',
+  'Los Angeles Public Library',
+  'Sacramento Public Library',
+  'New York Public Library',
+  'King County Library System',
+  'Auckland Libraries',
+  'Hutt City Libraries',
+  'Brisbane City Council Library Services',
+  'Mackay Regional Council',
+  'Hills Shire Library Service',
+  'Springvale Library and Information Service'
 ]
 
 
