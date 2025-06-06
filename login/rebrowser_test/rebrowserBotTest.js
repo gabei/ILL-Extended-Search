@@ -16,7 +16,7 @@ const botOptions = {
 }
 
 
-import userAgentList from './userAgents.json' with { type: 'json' };
+import userAgentList from '../userAgents.json' with { type: 'json' };
 async function getRandomUserAgent(){
   const randomIndex = Math.floor(Math.random() * userAgentList.length);
   return userAgentList[randomIndex].ua;

@@ -18,4 +18,18 @@ const worldCatConfig = {
   password: process.env.WORLDCAT_PASSWORD,
 }
 
-export { illConfig, worldCatConfig };
+const browserOptions = {
+  defaultViewport: null,
+  headless: false,
+  args: [
+    '--incognito',
+    '--disable-web-security',
+    '--disable-features=IsolateOrigins,site-per-process',
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-blink-features=AutomationControlled',
+  ],
+}
+
+export { illConfig, worldCatConfig, browserOptions };

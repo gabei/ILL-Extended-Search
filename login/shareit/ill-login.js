@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer';
-import { illConfig as config } from './config.js';
+import { illConfig as config } from '../config.js';
 
 
 

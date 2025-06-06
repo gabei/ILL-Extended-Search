@@ -1,23 +1,8 @@
 import puppeteer from 'puppeteer';
-import { worldCatConfig as config} from './config.js';
+import { worldCatConfig as config, browserOptions} from '../config.js';
 import { PuppeteerBlocker } from '@ghostery/adblocker-puppeteer';
 import fetch from 'cross-fetch';
 
-
-
-const browserOptions = {
-  defaultViewport: null,
-  headless: false,
-  args: [
-    '--incognito',
-    '--disable-web-security',
-    '--disable-features=IsolateOrigins,site-per-process',
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-    '--disable-dev-shm-usage',
-    '--disable-blink-features=AutomationControlled',
-  ],
-}
 
 
 const browser = await puppeteer.launch(browserOptions);
@@ -39,7 +24,7 @@ export default async function initWorldCat(){
   {
     await goToSearchPage();
     await waitForCookieModalToClose();
-    await enterIsbnAndSearch("9780062060624");
+    await enterIsbnAndSearch("9780970867100");
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     
     if(await landedOnSearchResultsPage()) await goToFirstSearchResult();
@@ -57,7 +42,6 @@ export default async function initWorldCat(){
     await waitFor(3000);
     const names = await getListOfLibraryNames();
     printLibraryNames(names);
-    
   } 
 
   catch(error){
