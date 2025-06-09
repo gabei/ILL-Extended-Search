@@ -1,6 +1,8 @@
-//import fuzz from "fuzzball";
+import { extract, token_sort_ratio } from 'fuzzball';
 import TXlenders from "./TXlenders.json" with {type: 'json'};
 import ALLlenders from "./ALLlenders.json" with {type: 'json'};
+
+
 
 const searchable_libraries = [
   'Ardmore Public Library',
@@ -27,15 +29,24 @@ const searchable_libraries = [
   'Springvale Library and Information Service'
 ]
 
+
+
 const normalizeString = (str) => {
   return String(str).toLowerCase();
 }
 
 
-
-const normalizeLibraryNames = (libraryNames) => {
-  return libraryNames.map((name) => {
+const normalizeLibraryNames = (libraries) => {
+  return libraries.map((name) => {
     return normalizeString(name);
+  });
+}
+
+
+
+const libraryNameList = (libraryNames) => {
+  return libraryNames.map((item) => {
+    return item.name;
   });
 }
 
@@ -49,14 +60,44 @@ const createLenderCodeDict = (lenderCodes) => {
     };
   });
 
-
   return dict;
 }
 
 
 
-const runNameMatchSearch = (data, lenders, matches) => {
+const runNameMatchSearch = (libraries, lenderDict, matches) => {
+  const validMatches = new Array();
+  const lenders = libraryNameList(lenderDict);
 
+  for(let library of libraries) {
+    let match = search(library, lenders);
+    console.log(match);
+
+    if( matchScoresHigherThan(match, 85) ) {
+      console.log(`Found match for ${library}: ${match}`);
+      validMatches.push();
+    }
+  }
+
+  return validMatches;
+}
+
+
+
+const search = (library, lenders) =>{
+  let match = extract(library, lenders, {
+    scorer: token_sort_ratio,
+    processor: (item) => item.name,
+    limit: 1
+  });
+
+  return match[0];
+}
+
+
+
+const matchScoresHigherThan = (match, threshold) => {
+  return match >= threshold;
 }
 
 
@@ -71,5 +112,6 @@ const printMatchList = (matches) => {
 
 }
 
-//console.log(createLenderCodeDict(TXlenders));
-// console.log(normalizeLibraryNames(searchable_libraries));
+//console.log(libraryNameList(createLenderCodeDict(TXlenders)));
+let matches = runNameMatchSearch(normalizeLibraryNames(searchable_libraries), createLenderCodeDict(TXlenders), []);
+console.log(matches);
