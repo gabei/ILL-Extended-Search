@@ -12,3 +12,27 @@ This tool is essentially a series of web crawlers that aim to speed up the time 
 
 ## Future Versions
 Soon I would like for this bot to also create the request and fill in the information for us. For the time being, looking up library names and returning the relevant possible lender information to us still saves a lot of time.
+
+
+# Requirements
+Several environment variables are in place to run these scripts. See setup below
+
+- [WorldCat](https://search.worldcat.org/) login credentials (associated with your library)
+- [ShareIt](https://texas.agshareit.com/home?cid=texas&lid=texas) login credentials (associated with your library)
+
+Your environment variables will look like this
+
+```
+ILL_LOGIN="your library's ShareIt landing page URL"
+ILL_REQUEST_PAGE="https://texas.agshareit.com/request"
+ILL_USERNAME="your ShareIt username"
+ILL_PASSWORD="your Shareit password"
+TECH_ACCOUNT="your library card number (if testing this locally)"
+WORLDCAT_USERNAME="your WorldCat username"
+WORLDCAT_PASSWORD="your WorldCat password"
+WORLDCAT_LOGIN="https://search.worldcat.org"
+WORLDCAT_HOME="https://search.worldcat.org/"
+REBROWSER_PATCHES_RUNTIME_FIX_MODE="addBinding"
+REBROWSER_PATCHES_DEBUG=1
+PORT=#### (whatever port you want your server to run on - not required)
+```
