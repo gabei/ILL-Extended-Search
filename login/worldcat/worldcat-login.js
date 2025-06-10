@@ -29,12 +29,7 @@ export default async function initWorldCat(){
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
 
     await attemptToLogin();
-    await handleLibraryLoadError();
-    await waitFor(1000);
-    await expandLibraryHoldingsList();
-    await waitFor(3000);
-    const names = await getListOfLibraryNames();
-    printLibraryNames(names);
+    await attemptToGetLibraryHoldingsList();
   } 
 
   catch(error){
@@ -164,6 +159,17 @@ async function inputLoginCredentials(){
   await page.locator('input#username').fill(config.username);
   await page.locator('input#password').fill(config.password);
   await page.locator('button[type="Submit"]').click();
+}
+
+
+
+async function attemptToGetLibraryHoldingsList(){
+  await handleLibraryLoadError();
+    await waitFor(1000);
+    await expandLibraryHoldingsList();
+    await waitFor(3000);
+    const names = await getListOfLibraryNames();
+    printLibraryNames(names);
 }
 
 
