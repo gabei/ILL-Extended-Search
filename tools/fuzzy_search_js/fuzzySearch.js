@@ -4,30 +4,30 @@ import ALLlenders from "./ALLlenders.json" with {type: 'json'};
 
 
 
-const searchable_libraries = [
-  'Ardmore Public Library',
-  'Springfield-Greene County Library District',
-  'Mid-Continent Public Library',
-  'Falls City Library and Arts Center',
-  'Saint Louis Public Library',
-  'Henderson County Public Library District',
-  'Johnson County Public Library',
-  'Carnegie Stout Public Library',
-  'Allen County Public Library',
-  'Hennepin County Library',
-  'K.O. Lee Aberdeen Public Library',
-  'Stark County District Library',
-  'Los Angeles Public Library',
-  'Sacramento Public Library',
-  'New York Public Library',
-  'King County Library System',
-  'Auckland Libraries',
-  'Hutt City Libraries',
-  'Brisbane City Council Library Services',
-  'Mackay Regional Council',
-  'Hills Shire Library Service',
-  'Springvale Library and Information Service'
-]
+// const searchable_libraries = [
+//   'Ardmore Public Library',
+//   'Springfield-Greene County Library District',
+//   'Mid-Continent Public Library',
+//   'Falls City Library and Arts Center',
+//   'Saint Louis Public Library',
+//   'Henderson County Public Library District',
+//   'Johnson County Public Library',
+//   'Carnegie Stout Public Library',
+//   'Allen County Public Library',
+//   'Hennepin County Library',
+//   'K.O. Lee Aberdeen Public Library',
+//   'Stark County District Library',
+//   'Los Angeles Public Library',
+//   'Sacramento Public Library',
+//   'New York Public Library',
+//   'King County Library System',
+//   'Auckland Libraries',
+//   'Hutt City Libraries',
+//   'Brisbane City Council Library Services',
+//   'Mackay Regional Council',
+//   'Hills Shire Library Service',
+//   'Springvale Library and Information Service'
+// ]
 
 
 
@@ -119,10 +119,14 @@ const printMatchList = (matches) => {
 
 
 
-let texasLenderList = createLenderCodeDict(TXlenders);
-let allLenderList = createLenderCodeDict(ALLlenders);
+export default async function initFuzzysearch(searchableLibraries){
+  let texasLenderList = createLenderCodeDict(TXlenders);
+  let allLenderList = createLenderCodeDict(ALLlenders);
 
-let txMatches = runNameMatchSearch(normalizeLibraryNames(searchable_libraries), texasLenderList);
-let allMatches = runNameMatchSearch(normalizeLibraryNames(searchable_libraries), allLenderList);
+  let txMatches = runNameMatchSearch(normalizeLibraryNames(searchableLibraries), texasLenderList);
+  let allMatches = runNameMatchSearch(normalizeLibraryNames(searchableLibraries), allLenderList);
 
-printMatchList(removeDuplicateEntries(txMatches, allMatches))
+  return removeDuplicateEntries(txMatches, allMatches)
+}
+
+

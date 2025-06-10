@@ -2,27 +2,28 @@ import puppeteer from 'puppeteer';
 import { worldCatConfig as config, browserOptions} from '../config.js';
 import { PuppeteerBlocker } from '@ghostery/adblocker-puppeteer';
 import fetch from 'cross-fetch';
+import initFuzzysearch from '../../tools/fuzzy_search_js/fuzzySearch.js';
 
 
 
 const browser = await puppeteer.launch(browserOptions);
-  const page = (await browser.pages())[0] // use current tab
+const page = (await browser.pages())[0] // use current tab
   page.setDefaultNavigationTimeout(60000); // 10 seconds
   page.setCacheEnabled(false);
 
-  // setup adblock with Ghostery
-  PuppeteerBlocker
-    .fromPrebuiltAdsAndTracking(fetch)
-    .then((blocker) => {
-      blocker.enableBlockingInPage(page);
-    })
+// setup adblock with Ghostery
+PuppeteerBlocker
+  .fromPrebuiltAdsAndTracking(fetch)
+  .then((blocker) => {
+    blocker.enableBlockingInPage(page);
+  })
 
 
 
-export default async function initWorldCat(){
+export default async function initWorldCat(ISBN){
   try 
   {
-    await goToMainSearchPageAndAttemptSearch("9781542513968");
+    await goToMainSearchPageAndAttemptSearch(ISBN);
     
     let currentlyOnSearchPage = await landedOnSearchResultsPage();
     if(currentlyOnSearchPage) await goToFirstSearchResult();
@@ -31,6 +32,7 @@ export default async function initWorldCat(){
     await attemptToLogin();
     let libraryNames = await attemptToGetLibraryHoldingsList();
     printLibraryNames(libraryNames);
+    return await initFuzzysearch(libraryNames);
   } 
 
   catch(error){
@@ -281,10 +283,4 @@ async function elementExists(divSelector) {
 
 async function waitFor(time){
   return new Promise(resolve => setTimeout(resolve, time));
-}
-
-
-
-async function exportLibraryNames(){
-  
 }
