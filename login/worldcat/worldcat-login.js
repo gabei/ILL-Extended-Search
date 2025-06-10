@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer';
 import { worldCatConfig as config, browserOptions} from '../config.js';
 import { PuppeteerBlocker } from '@ghostery/adblocker-puppeteer';
 import fetch from 'cross-fetch';
+import initFuzzysearch from '../../tools/fuzzy_search_js/fuzzySearch.js';
 
 
 
@@ -31,7 +32,7 @@ export default async function initWorldCat(ISBN){
     await attemptToLogin();
     let libraryNames = await attemptToGetLibraryHoldingsList();
     printLibraryNames(libraryNames);
-    return libraryNames;
+    return await initFuzzysearch(libraryNames);
   } 
 
   catch(error){
