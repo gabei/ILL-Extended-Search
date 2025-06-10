@@ -1,4 +1,4 @@
-import { extract, token_sort_ratio } from 'fuzzball';
+import { extract, ratio } from 'fuzzball';
 import TXlenders from "./TXlenders.json" with {type: 'json'};
 import ALLlenders from "./ALLlenders.json" with {type: 'json'};
 
@@ -65,17 +65,17 @@ const createLenderCodeDict = (lenderCodes) => {
 
 
 
-const runNameMatchSearch = (libraries, lenderDict, matches) => {
+const runNameMatchSearch = (libraries, lenderDict) => {
   const validMatches = new Array();
   const lenders = libraryNameList(lenderDict);
+  
 
   for(let library of libraries) {
-    let match = search(library, lenders);
-    console.log(match);
+    let [name, score] = search(library, lenders);
 
-    if( matchScoresHigherThan(match, 85) ) {
-      console.log(`Found match for ${library}: ${match}`);
-      validMatches.push();
+    if( matchScoresHigherThan(score, 88) ) {
+      //console.log(`Found match for ${library}: ${name}`);
+      validMatches.push(lenderDict.find((item) => item.name === name));
     }
   }
 
@@ -86,8 +86,7 @@ const runNameMatchSearch = (libraries, lenderDict, matches) => {
 
 const search = (library, lenders) =>{
   let match = extract(library, lenders, {
-    scorer: token_sort_ratio,
-    processor: (item) => item.name,
+    scorer: ratio,
     limit: 1
   });
 
@@ -102,16 +101,28 @@ const matchScoresHigherThan = (match, threshold) => {
 
 
 
-const removeDuplicateEntries = (matches) => {
-
+const removeDuplicateEntries = (list1, list2) => {
+  // Combine both lists and remove duplicates based on the 'code' property
+  // Set ensures uniqueness if a code is added twice
+  let combined = [...list1, ...list2];
+  return Array.from(new Set(combined.map(item => item.code)));
 }
 
 
 
 const printMatchList = (matches) => {
-
+  console.log("Matches found: " + matches);
+  for(let match of matches) {
+    console.log(match)
+  }
 }
 
-//console.log(libraryNameList(createLenderCodeDict(TXlenders)));
-let matches = runNameMatchSearch(normalizeLibraryNames(searchable_libraries), createLenderCodeDict(TXlenders), []);
-console.log(matches);
+
+
+let texasLenderList = createLenderCodeDict(TXlenders);
+let allLenderList = createLenderCodeDict(ALLlenders);
+
+let txMatches = runNameMatchSearch(normalizeLibraryNames(searchable_libraries), texasLenderList);
+let allMatches = runNameMatchSearch(normalizeLibraryNames(searchable_libraries), allLenderList);
+
+printMatchList(removeDuplicateEntries(txMatches, allMatches))
