@@ -29,7 +29,8 @@ export default async function initWorldCat(){
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
 
     await attemptToLogin();
-    await attemptToGetLibraryHoldingsList();
+    let libraryNames = await attemptToGetLibraryHoldingsList();
+    printLibraryNames(libraryNames);
   } 
 
   catch(error){
@@ -169,7 +170,7 @@ async function attemptToGetLibraryHoldingsList(){
     await expandLibraryHoldingsList();
     await waitFor(3000);
     const names = await getListOfLibraryNames();
-    printLibraryNames(names);
+    return names;
 }
 
 
