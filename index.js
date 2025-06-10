@@ -1,4 +1,4 @@
-
+import initWorldcat from './login/worldcat/worldcat-login.js';
 
 import express from 'express';
 import dotenv from 'dotenv';
@@ -14,8 +14,9 @@ app.listen(port || 3000, () => {
   console.log("App listening on port " + port);
 })
 
-app.get("/search", (req, res)=> {
-  const item = req.query.code
-  console.log(item)
-  res.send(`You sent ${item}!`);
+app.get("/search", async (req, res)=> {
+  const ISBN = req.query.code
+  // filter for valid ISBN
+  let libraryList = await initWorldcat(ISBN);
+  res.send(`Libraries:\n ${libraryList}!`);
 });

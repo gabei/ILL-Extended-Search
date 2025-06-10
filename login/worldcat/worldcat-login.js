@@ -6,23 +6,23 @@ import fetch from 'cross-fetch';
 
 
 const browser = await puppeteer.launch(browserOptions);
-  const page = (await browser.pages())[0] // use current tab
+const page = (await browser.pages())[0] // use current tab
   page.setDefaultNavigationTimeout(60000); // 10 seconds
   page.setCacheEnabled(false);
 
-  // setup adblock with Ghostery
-  PuppeteerBlocker
-    .fromPrebuiltAdsAndTracking(fetch)
-    .then((blocker) => {
-      blocker.enableBlockingInPage(page);
-    })
+// setup adblock with Ghostery
+PuppeteerBlocker
+  .fromPrebuiltAdsAndTracking(fetch)
+  .then((blocker) => {
+    blocker.enableBlockingInPage(page);
+  })
 
 
 
-export default async function initWorldCat(){
+export default async function initWorldCat(ISBN){
   try 
   {
-    await goToMainSearchPageAndAttemptSearch("9781542513968");
+    await goToMainSearchPageAndAttemptSearch(ISBN);
     
     let currentlyOnSearchPage = await landedOnSearchResultsPage();
     if(currentlyOnSearchPage) await goToFirstSearchResult();
@@ -31,6 +31,7 @@ export default async function initWorldCat(){
     await attemptToLogin();
     let libraryNames = await attemptToGetLibraryHoldingsList();
     printLibraryNames(libraryNames);
+    return libraryNames;
   } 
 
   catch(error){
@@ -281,10 +282,4 @@ async function elementExists(divSelector) {
 
 async function waitFor(time){
   return new Promise(resolve => setTimeout(resolve, time));
-}
-
-
-
-async function exportLibraryNames(){
-  
 }
