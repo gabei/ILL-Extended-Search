@@ -1,0 +1,17 @@
+{
+  "name": "fuzzy_search_js",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "fuzzySearch.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fuzzball": "^2.2.2",
+    "jsonlint": "^1.6.3"
+  }
+}

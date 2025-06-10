@@ -22,10 +22,11 @@ const browser = await puppeteer.launch(browserOptions);
 export default async function initWorldCat(){
   try 
   {
-    await goToMainSearchPageAndAttemptSearch("9780970867100");
+    await goToMainSearchPageAndAttemptSearch("9781542513968");
     
     let currentlyOnSearchPage = await landedOnSearchResultsPage();
     if(currentlyOnSearchPage) await goToFirstSearchResult();
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
 
     await attemptToLogin();
     await handleLibraryLoadError();
@@ -249,6 +250,7 @@ async function getListOfLibraryNames(){
 
 
 function printLibraryNames(names){
+  console.log(names);
   console.log("List of library names:");
   names.forEach((name) => {
     console.log(name);
@@ -272,4 +274,10 @@ async function elementExists(divSelector) {
 
 async function waitFor(time){
   return new Promise(resolve => setTimeout(resolve, time));
+}
+
+
+
+async function exportLibraryNames(){
+  
 }
