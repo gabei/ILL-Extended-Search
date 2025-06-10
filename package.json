@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "cors": "^2.8.5",
     "cross-fetch": "^4.1.0",
+    "dotenv": "^16.5.0",
     "express": "^5.1.0"
   },
   "name": "ill-extended-search",
@@ -10,7 +12,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "fuzzysearch": "py tools/fuzzysearch.py"
+    "fuzzysearch": "node tools/fuzzy_search_js/fuzzysearch.js"
   },
   "author": "Gabe Garcia",
   "license": "ISC"
