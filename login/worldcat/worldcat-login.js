@@ -26,13 +26,19 @@ export default async function initWorldCat(ISBN){
     await goToMainSearchPageAndAttemptSearch(ISBN);
     
     let currentlyOnSearchPage = await landedOnSearchResultsPage();
-    if(currentlyOnSearchPage) await goToFirstSearchResult();
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    if(currentlyOnSearchPage) {
+      await goToFirstSearchResult();
+      await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    } else {
+      await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    }
+    
 
     await attemptToLogin();
     let libraryNames = await attemptToGetLibraryHoldingsList();
-    printLibraryNames(libraryNames);
-    return await initFuzzysearch(libraryNames);
+    let libraryCodes = await initFuzzysearch(libraryNames);
+    console.log(libraryCodes);
+    return libraryCodes;
   } 
 
   catch(error){
@@ -238,6 +244,7 @@ async function waitForElementToAppearAndClick(selector, maxWaitTime = 5000) {
   
   if(elementReady) {
     await page.locator(selector).click();
+    console.log("Element clicked!");
     return true;
   } else {
     return false;

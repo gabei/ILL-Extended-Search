@@ -22,5 +22,5 @@ app.get("/search", async (req, res)=> {
   const ISBN = req.query.code
   // filter for valid ISBN
   let libraryList = await initWorldcat(ISBN);
-  res.send(`Libraries:\n ${libraryList}!`);
+  res.json(libraryList);
 });
