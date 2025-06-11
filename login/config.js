@@ -22,6 +22,7 @@ const browserOptions = {
   defaultViewport: null,
   headless: false,
   args: [
+    '--window-size=1200,800',
     '--incognito',
     '--disable-web-security',
     '--disable-features=IsolateOrigins,site-per-process',

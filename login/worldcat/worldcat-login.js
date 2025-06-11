@@ -26,12 +26,9 @@ export default async function initWorldCat(ISBN){
     await goToMainSearchPageAndAttemptSearch(ISBN);
     
     let currentlyOnSearchPage = await landedOnSearchResultsPage();
-    if(currentlyOnSearchPage) {
-      await goToFirstSearchResult();
-      await page.waitForNavigation({ waitUntil: 'networkidle0' });
-    } else {
-      await page.waitForNavigation({ waitUntil: 'networkidle0' });
-    }
+    if(currentlyOnSearchPage)  await goToFirstSearchResult();
+    //wait page.waitForNavigation({ waitUntil: 'networkidle0' });
+    
     
 
     await attemptToLogin();
@@ -133,6 +130,7 @@ async function attemptToLogin(){
   try {
     await goToSignInPage();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await waitFor(2000); // compensate for weird email entering behavior
     await inputEmail();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     await inputLoginCredentials();
@@ -243,6 +241,7 @@ async function waitForElementToAppearAndClick(selector, maxWaitTime = 5000) {
   );
   
   if(elementReady) {
+    await page.locator(selector).hover();
     await page.locator(selector).click();
     console.log("Element clicked!");
     return true;
@@ -265,16 +264,6 @@ async function getListOfLibraryNames(){
 
 
 
-function printLibraryNames(names){
-  console.log(names);
-  console.log("List of library names:");
-  names.forEach((name) => {
-    console.log(name);
-  });
-}
-
-
-
 async function elementExists(divSelector) {
   const exists = 
   await page.$(divSelector, () =>{
@@ -291,3 +280,17 @@ async function elementExists(divSelector) {
 async function waitFor(time){
   return new Promise(resolve => setTimeout(resolve, time));
 }
+
+
+
+function printLibraryNames(names){
+  console.log(names);
+  console.log("List of library names:");
+  names.forEach((name) => {
+    console.log(name);
+  });
+}
+
+
+
+
