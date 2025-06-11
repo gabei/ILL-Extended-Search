@@ -1,6 +1,8 @@
 # ILL-Extended-Search
 ILL Extended Search is a tool (WIP) that aims to reduce the amount of time and effort it takes to make out-of-network inter-library loan requests.
 
+This server responds to requests from [this client](https://github.com/gabei/LTCL-client)
+
 ## Inter-library Loans (ILL)
 Our library participates in the Texas ILL system, which allows libraries to borrow books from other participating institutions.
 
