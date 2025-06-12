@@ -5,7 +5,7 @@ import initFuzzysearch from '../../tools/fuzzy_search_js/fuzzySearch.js';
 
 
 const browser = await puppeteer.launch(browserOptions);
-const page = (await browser.pages())[0] // use current tab
+const page = await browser.newPage()
   page.setDefaultNavigationTimeout(60000); // 10 seconds
   page.setCacheEnabled(false);
 
@@ -26,11 +26,11 @@ export default async function initWorldCat(ISBN){
     return libraryCodes;
   } 
   catch(error){
-    console.error("There was an error during login: " + error.message);
+    console.error(`There was an error during login:\n${error.message}\n${error.stack}`);
   } 
   finally {
     await page.close();
-    await browser.close();
+    //await browser.close();
   }
 }
 
@@ -40,7 +40,7 @@ async function goToMainSearchPageAndAttemptSearch(isbn){
     await goToSearchPage();
     await waitForCookieModalToClose();
     await enterIsbnAndSearch(isbn);
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await page.waitForNavigation();
   }
 
   catch (error) {
@@ -66,6 +66,7 @@ async function enterIsbnAndSearch(isbn){
   try {
     await page.locator('input[type="text"]').fill(isbn);
     await page.locator('button[type="Submit"]').click();
+    console.log("Searched for isbn " + isbn);
   } catch (error) {
     console.error("Error during ISBN search: " + error.message);
     throw new Error("Error during ISBN search: " + error.message);; // rethrow to handle it in the main function
@@ -77,6 +78,7 @@ async function landedOnSearchResultsPage(){
   // It is possible to land on a search results page rather than the book page
   // In that case, we should click on the top result
   // Below we check if we are looking at a search results page
+  console.log("Checking if we landed on search results...");
   let searchResultItem = page.locator('li[data-testid="search-result-item"');
   if(searchResultItem) return true;
   return false;
@@ -110,8 +112,7 @@ async function goToFirstSearchResult(){
 async function attemptToLogin(){
   try {
     await goToSignInPage();
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
-    await waitFor(2000); // compensate for weird email entering behavior
+    //await page.waitForNavigation();
     await inputEmail();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     await inputLoginCredentials();
@@ -128,12 +129,15 @@ async function attemptToLogin(){
 async function goToSignInPage(){
   console.log("Attempting to navigate to sign-in page...");
   let signInLinkFound = await waitForElementToAppearAndClick('a[data-testid="header-sign-in-link"]');
-  console.log("Sign-in link found and clicked: " + signInLinkFound);  
+  signInLinkFound 
+  ? console.log("Sign-in link found and clicked!")
+  : console.log("Could not navigate to sign-in.");
 }
 
 
 async function inputEmail(){
     console.log("Attempting to input email...");
+    await waitFor(2000); // compensate for weird email entering behavior
     await page.locator('input[type="text"]').fill(config.username);
     await page.locator('button[type="Submit"]').click();
 }
