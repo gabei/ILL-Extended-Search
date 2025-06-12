@@ -1,3 +1,5 @@
+import { page } from "./browser.js";
+
 async function elementExists(divSelector) {
   const exists = 
   await page.$(divSelector, () =>{

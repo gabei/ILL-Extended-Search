@@ -1,32 +1,21 @@
-import puppeteer from 'puppeteer';
-import { worldCatConfig as config, browserOptions} from '../config.js';
+import { worldCatConfig as config } from '../config.js';
 import { elementExists, waitFor } from '../general/general.js';
 import initFuzzysearch from '../../tools/fuzzy_search_js/fuzzySearch.js';
-
-
-const browser = await puppeteer.launch(browserOptions);
-const page = await browser.newPage()
-  page.setDefaultNavigationTimeout(60000); // 10 seconds
-  page.setCacheEnabled(false);
+import { page } from '../general/browser.js';
 
 
 export default async function initWorldCat(ISBN){
   try 
   {
     await goToMainSearchPageAndAttemptSearch(ISBN);
-    
-    let currentlyOnSearchPage = await landedOnSearchResultsPage();
-    if(currentlyOnSearchPage)  await goToFirstSearchResult();
-    //wait page.waitForNavigation({ waitUntil: 'networkidle0' });
-
     await attemptToLogin();
-    let libraryNames = await attemptToGetLibraryHoldingsList();
-    let libraryCodes = await initFuzzysearch(libraryNames);
-    console.log(libraryCodes);
+    //await page.waitForNavigation();
+    await handleResultsPage();
+    let libraryCodes = await scrapeForLenderData();
     return libraryCodes;
   } 
   catch(error){
-    console.error(`There was an error during login:\n${error.message}\n${error.stack}`);
+    console.error(`There was an error during navigation:\n${error.stack}`);
   } 
   finally {
     await page.close();
@@ -71,6 +60,12 @@ async function enterIsbnAndSearch(isbn){
     console.error("Error during ISBN search: " + error.message);
     throw new Error("Error during ISBN search: " + error.message);; // rethrow to handle it in the main function
   }
+}
+
+
+async function handleResultsPage() {
+    let currentlyOnSearchPage = await landedOnSearchResultsPage();
+    if(currentlyOnSearchPage)  await goToFirstSearchResult();
 }
 
 
@@ -148,6 +143,14 @@ async function inputLoginCredentials(){
   await page.locator('input#username').fill(config.username);
   await page.locator('input#password').fill(config.password);
   await page.locator('button[type="Submit"]').click();
+}
+
+
+async function scrapeForLenderData(){
+    let libraryNames = await attemptToGetLibraryHoldingsList();
+    let libraryCodes = await initFuzzysearch(libraryNames);
+    console.log(libraryCodes);
+    return libraryCodes;
 }
 
 
