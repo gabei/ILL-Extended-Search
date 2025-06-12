@@ -1,15 +1,17 @@
+import { page } from '../general/browser.js';
 import { worldCatConfig as config } from '../config.js';
 import { elementExists, waitFor } from '../general/general.js';
 import initFuzzysearch from '../../tools/fuzzy_search_js/fuzzySearch.js';
-import { page } from '../general/browser.js';
 
+
+let cookiesRejected = false;
+let signedIn = false;
 
 export default async function initWorldCat(ISBN){
   try 
   {
     await goToMainSearchPageAndAttemptSearch(ISBN);
-    await attemptToLogin();
-    //await page.waitForNavigation();
+    if ( !signedIn) await attemptToLogin();
     await handleResultsPage();
     let libraryCodes = await scrapeForLenderData();
     return libraryCodes;
@@ -18,8 +20,8 @@ export default async function initWorldCat(ISBN){
     console.error(`There was an error during navigation:\n${error.stack}`);
   } 
   finally {
-    await page.close();
-    //await browser.close();
+    await goToSearchPage();
+    console.log("Process complete!\n");
   }
 }
 
@@ -27,7 +29,7 @@ export default async function initWorldCat(ISBN){
 async function goToMainSearchPageAndAttemptSearch(isbn){
   try {
     await goToSearchPage();
-    await waitForCookieModalToClose();
+    if( !cookiesRejected ) await waitForCookieModalToClose();
     await enterIsbnAndSearch(isbn);
     await page.waitForNavigation();
   }
@@ -48,6 +50,7 @@ async function waitForCookieModalToClose(){
   // wait for cookie button to appear and then click on it
   let selector = "#onetrust-reject-all-handler";
   await waitForElementToAppearAndClick(selector);
+  cookiesRejected = true;
 }
 
 
@@ -112,6 +115,7 @@ async function attemptToLogin(){
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     await inputLoginCredentials();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    signedIn = true;
   }
 
   catch (error) {
