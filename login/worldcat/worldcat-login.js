@@ -1,23 +1,13 @@
 import puppeteer from 'puppeteer';
 import { worldCatConfig as config, browserOptions} from '../config.js';
-import { PuppeteerBlocker } from '@ghostery/adblocker-puppeteer';
-import fetch from 'cross-fetch';
+import { elementExists, waitFor } from '../general/general.js';
 import initFuzzysearch from '../../tools/fuzzy_search_js/fuzzySearch.js';
-
 
 
 const browser = await puppeteer.launch(browserOptions);
 const page = (await browser.pages())[0] // use current tab
   page.setDefaultNavigationTimeout(60000); // 10 seconds
   page.setCacheEnabled(false);
-
-// setup adblock with Ghostery
-PuppeteerBlocker
-  .fromPrebuiltAdsAndTracking(fetch)
-  .then((blocker) => {
-    blocker.enableBlockingInPage(page);
-  })
-
 
 
 export default async function initWorldCat(ISBN){
@@ -28,8 +18,6 @@ export default async function initWorldCat(ISBN){
     let currentlyOnSearchPage = await landedOnSearchResultsPage();
     if(currentlyOnSearchPage)  await goToFirstSearchResult();
     //wait page.waitForNavigation({ waitUntil: 'networkidle0' });
-    
-    
 
     await attemptToLogin();
     let libraryNames = await attemptToGetLibraryHoldingsList();
@@ -37,7 +25,6 @@ export default async function initWorldCat(ISBN){
     console.log(libraryCodes);
     return libraryCodes;
   } 
-
   catch(error){
     console.error("There was an error during login: " + error.message);
   } 
@@ -46,7 +33,6 @@ export default async function initWorldCat(ISBN){
     await browser.close();
   }
 }
-
 
 
 async function goToMainSearchPageAndAttemptSearch(isbn){
@@ -64,11 +50,9 @@ async function goToMainSearchPageAndAttemptSearch(isbn){
 }
 
 
-
 async function goToSearchPage(){
    await page.goto(config.searchPage);
 }
-
 
 
 async function waitForCookieModalToClose(){
@@ -76,7 +60,6 @@ async function waitForCookieModalToClose(){
   let selector = "#onetrust-reject-all-handler";
   await waitForElementToAppearAndClick(selector);
 }
-
 
 
 async function enterIsbnAndSearch(isbn){
@@ -90,7 +73,6 @@ async function enterIsbnAndSearch(isbn){
 }
 
 
-
 async function landedOnSearchResultsPage(){
   // It is possible to land on a search results page rather than the book page
   // In that case, we should click on the top result
@@ -99,7 +81,6 @@ async function landedOnSearchResultsPage(){
   if(searchResultItem) return true;
   return false;
 }
-
 
 
 async function goToFirstSearchResult(){
@@ -144,7 +125,6 @@ async function attemptToLogin(){
 }
 
 
-
 async function goToSignInPage(){
   console.log("Attempting to navigate to sign-in page...");
   let signInLinkFound = await waitForElementToAppearAndClick('a[data-testid="header-sign-in-link"]');
@@ -152,13 +132,11 @@ async function goToSignInPage(){
 }
 
 
-
 async function inputEmail(){
     console.log("Attempting to input email...");
     await page.locator('input[type="text"]').fill(config.username);
     await page.locator('button[type="Submit"]').click();
 }
-
 
 
 async function inputLoginCredentials(){ 
@@ -169,7 +147,6 @@ async function inputLoginCredentials(){
 }
 
 
-
 async function attemptToGetLibraryHoldingsList(){
   await handleLibraryLoadError();
     await waitFor(1000);
@@ -178,7 +155,6 @@ async function attemptToGetLibraryHoldingsList(){
     const names = await getListOfLibraryNames();
     return names;
 }
-
 
 
 async function handleLibraryLoadError(){
@@ -202,7 +178,6 @@ async function handleLibraryLoadError(){
     return true;
   }
 }
-
 
 
 async function expandLibraryHoldingsList(){
@@ -252,42 +227,12 @@ async function waitForElementToAppearAndClick(selector, maxWaitTime = 5000) {
 }
 
 
-
 async function getListOfLibraryNames(){
   return await page.evaluate(()=> {
     // This function will return a list of library names from the holdings list
     let names = document.querySelectorAll('ul[data-testid="holding-list-details"] li strong');
     console.log(names);
     return Array.from(names).map((name) => name.innerText);
-  });
-}
-
-
-
-async function elementExists(divSelector) {
-  const exists = 
-  await page.$(divSelector, () =>{
-    return true
-  }).catch(() => {
-    return false
-  });
-
-  return exists
-}
-
-
-
-async function waitFor(time){
-  return new Promise(resolve => setTimeout(resolve, time));
-}
-
-
-
-function printLibraryNames(names){
-  console.log(names);
-  console.log("List of library names:");
-  names.forEach((name) => {
-    console.log(name);
   });
 }
 
