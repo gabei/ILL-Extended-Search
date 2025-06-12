@@ -13,6 +13,8 @@ export default async function initWorldCat(ISBN){
     await goToMainSearchPageAndAttemptSearch(ISBN);
     if ( !signedIn) await attemptToLogin();
     await handleResultsPage();
+    let bookInfo = await scrapeForBookData();
+    console.log(bookInfo);
     let libraryCodes = await scrapeForLenderData();
     return libraryCodes;
   } 
@@ -242,11 +244,16 @@ async function getListOfLibraryNames(){
   return await page.evaluate(()=> {
     // This function will return a list of library names from the holdings list
     let names = document.querySelectorAll('ul[data-testid="holding-list-details"] li strong');
-    console.log(names);
     return Array.from(names).map((name) => name.innerText);
   });
 }
 
 
-
+async function scrapeForBookData(){
+  return await page.evaluate(() => {
+    //let title = document.querySelector('h1 span');
+    let author = document.querySelector('a[data-testid^="author-"]');
+    return author.innerHTML
+  });
+}
 
