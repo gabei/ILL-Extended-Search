@@ -253,7 +253,12 @@ async function scrapeForBookData(){
   return await page.evaluate(() => {
     let title = document.querySelector('h1 > div > span');
     let author = document.querySelector('a[data-testid^="author-"]');
-    return [title.innerHTML.trim(), author.innerHTML.trim()]
+    let isbn = document.querySelector('span[aria-labeled^="isbn-"]');
+    return {
+      title: title.innerHTML.trim(),
+      author: author.innerHTML.trim(),
+      isbn: isbn.innerHTML.trim(),
+    }
   });
 }
 
