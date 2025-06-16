@@ -2,11 +2,9 @@ import puppeteer from 'puppeteer';
 import { illConfig as config, browserOptions } from '../config.js';
 
 
-
 const browser = await puppeteer.launch(browserOptions);
 const page = (await browser.pages())[0];
 page.setDefaultNavigationTimeout(10000); // 10 seconds
-
 
 
 export default async function initILL(){
@@ -26,7 +24,6 @@ export default async function initILL(){
 }
 
 
-
 async function login() { 
   await page.goto(config.loginPage);
   await printCurrentPageTitleAndURL();
@@ -37,7 +34,6 @@ async function login() {
   await page.waitForNavigation();
   await printCurrentPageTitleAndURL();
 }
-
 
 
 async function openBlankRequest(patronID) {
@@ -59,7 +55,6 @@ async function openBlankRequest(patronID) {
   
   
 }
-
 
 
 async function printCurrentPageTitleAndURL() {
