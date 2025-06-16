@@ -13,6 +13,7 @@ export default async function initWorldCat(ISBN){
     await goToMainSearchPageAndAttemptSearch(ISBN);
     if ( !signedIn) await attemptToLogin();
     await handleResultsPage();
+    await handleLibraryLoadError();
     let bookInfo = await scrapeForBookData();
     console.log(bookInfo);
     let libraryCodes = await scrapeForLenderData();
@@ -161,7 +162,6 @@ async function scrapeForLenderData(){
 
 
 async function attemptToGetLibraryHoldingsList(){
-  await handleLibraryLoadError();
     await waitFor(1000);
     await expandLibraryHoldingsList();
     await waitFor(3000);
@@ -251,9 +251,9 @@ async function getListOfLibraryNames(){
 
 async function scrapeForBookData(){
   return await page.evaluate(() => {
-    //let title = document.querySelector('h1 span');
+    let title = document.querySelector('h1 > div > span');
     let author = document.querySelector('a[data-testid^="author-"]');
-    return author.innerHTML
+    return [title.innerHTML.trim(), author.innerHTML.trim()]
   });
 }
 
