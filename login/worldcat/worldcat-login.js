@@ -14,10 +14,9 @@ export default async function initWorldCat(ISBN){
     if ( !signedIn) await attemptToLogin();
     await handleResultsPage();
     await handleLibraryLoadError();
-    let bookInfo = await scrapeForBookData();
-    console.log(bookInfo);
-    let libraryCodes = await scrapeForLenderData();
-    return libraryCodes;
+    let bookData = await scrapeForBookData();
+    console.log(bookData);
+    return bookData;
   } 
   catch(error){
     console.error(`There was an error during navigation:\n${error.stack}`);
@@ -152,6 +151,26 @@ async function inputLoginCredentials(){
   await page.locator('button[type="Submit"]').click();
 }
 
+async function scrapeForBookData(){
+  let bookData =  await page.evaluate(async () => {
+    let title = document.querySelector('h1 > div > span');
+    let author = document.querySelector('a[data-testid^="author-"]');
+    let isbn = document.querySelector('span[aria-labelledby^="isbn-"] > div > span');
+    let oclc = document.querySelector('span[aria-labelledby^="oclcnumber-"]');
+    let publisher = document.querySelector('span[data-testid^="publisher-"]')
+    return {
+      title: title.innerText.trim(),
+      author: author.innerText.trim(),
+      isbn: isbn.innerText.trim(),
+      oclc: oclc.innerText.trim(),
+      publisher: publisher.innerText.trim(),
+    }
+  });
+
+  let lenderData = await scrapeForLenderData();
+  return {...bookData, lenderData}
+}
+
 
 async function scrapeForLenderData(){
     let libraryNames = await attemptToGetLibraryHoldingsList();
@@ -249,16 +268,5 @@ async function getListOfLibraryNames(){
 }
 
 
-async function scrapeForBookData(){
-  return await page.evaluate(() => {
-    let title = document.querySelector('h1 > div > span');
-    let author = document.querySelector('a[data-testid^="author-"]');
-    let isbn = document.querySelector('span[aria-labeled^="isbn-"]');
-    return {
-      title: title.innerHTML.trim(),
-      author: author.innerHTML.trim(),
-      isbn: isbn.innerHTML.trim(),
-    }
-  });
-}
+
 
