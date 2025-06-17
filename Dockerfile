@@ -1,5 +1,5 @@
 # Use latest verson of node
-FROM node:lts-alpine
+FROM node:slim as app
 
 # Skip Chromium download in favor of installing manually
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
