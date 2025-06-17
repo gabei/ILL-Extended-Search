@@ -11,7 +11,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "build": "npm install && npm run install:login && npm run install:search && npm run install:chrome",
+    "build": "npm install && npm run install:login && npm run install:search",
     "install:login": "cd login && npm install",
     "install:search": "cd tools/fuzzy_search_js && npm install",
     "install:chrome": "npx puppeteer browsers install chrome"

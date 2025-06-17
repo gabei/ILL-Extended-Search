@@ -19,6 +19,7 @@ const worldCatConfig = {
 }
 
 const browserOptions = {
+  executablePath: 'usr/bin/google-chrome',
   defaultViewport: null,
   headless: true,
   args: [
