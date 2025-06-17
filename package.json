@@ -11,7 +11,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "postinstall": "(cd login && npm install); (cd tools/fuzzy_search_js && npm install);"
+    "postinstall": "(npx puppeteer browsers install chrome); (cd login && npm install); (cd tools/fuzzy_search_js && npm install);"
   },
   "author": "Gabe Garcia",
   "license": "ISC"
