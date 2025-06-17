@@ -10,9 +10,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "fuzzysearch": "node tools/fuzzy_search_js/fuzzysearch.js"
+    "postinstall": "(cd login && npm install); (cd tools/fuzzy_search_js && npm install);"
   },
   "author": "Gabe Garcia",
   "license": "ISC"
