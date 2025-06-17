@@ -20,7 +20,7 @@ const worldCatConfig = {
 
 const browserOptions = {
   defaultViewport: null,
-  headless: false,
+  headless: true,
   args: [
     '--window-size=1200,800',
     '--incognito',

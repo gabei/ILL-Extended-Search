@@ -4,6 +4,7 @@ import { elementExists, waitFor } from '../general/general.js';
 import initFuzzysearch from '../../tools/fuzzy_search_js/fuzzySearch.js';
 
 
+
 let cookiesRejected = false;
 let signedIn = false;
 
