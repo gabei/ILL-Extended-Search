@@ -1,21 +1,21 @@
 {
+  "name": "ill-extended-search",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "author": "Gabe Garcia",
+  "license": "ISC",
+  "scripts": {
+    "start": "node index.js",
+    "build": "npm run install:login && npm run install:search",
+    "install:login": "cd login && npm install",
+    "install:search": "cd tools/fuzzy_search_js && npm install"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "cross-fetch": "^4.1.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0"
-  },
-  "name": "ill-extended-search",
-  "description": "",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "build": "npm install && npm run install:login && npm run install:search && npm run install:chrome",
-    "install:login": "cd login && npm install",
-    "install:search": "cd tools/fuzzy_search_js && npm install",
-    "install:chrome": "npx puppeteer browsers install chrome"
-  },
-  "author": "Gabe Garcia",
-  "license": "ISC"
+  }
 }
