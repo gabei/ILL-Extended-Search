@@ -25,6 +25,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /usr/app
 
+ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
 COPY --from=builder /usr/app ./
 
 EXPOSE 8000
