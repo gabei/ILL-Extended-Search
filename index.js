@@ -19,8 +19,12 @@ app.listen(port || 8000, () => {
 
 
 app.get("/search", async (req, res)=> {
-  const ISBN = req.query.code
-  // filter for valid ISBN
-  let libraryList = await initWorldcat(ISBN);
-  res.json(libraryList);
+  try {
+    const ISBN = req.query.code
+    let libraryList = await initWorldcat(ISBN);
+    res.json(libraryList);
+  } catch(error) {
+    res.status(500).send("Something went wrong. Double check the supplied lookup code and try again.");
+  }
+  
 });

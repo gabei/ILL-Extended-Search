@@ -21,6 +21,7 @@ export default async function initWorldCat(ISBN){
   } 
   catch(error){
     console.error(`There was an error during navigation:\n${error.stack}`);
+    return error;
   } 
   finally {
     await goToSearchPage();
