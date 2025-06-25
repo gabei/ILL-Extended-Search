@@ -71,7 +71,7 @@ async function enterIsbnAndSearch(isbn){
 
 async function handleResultsPage() {
     let currentlyOnSearchPage = await landedOnSearchResultsPage();
-    if(currentlyOnSearchPage)  await goToFirstSearchResult();
+    if(currentlyOnSearchPage) await goToFirstSearchResult();
 }
 
 
@@ -79,16 +79,19 @@ async function landedOnSearchResultsPage(){
   // It is possible to land on a search results page rather than the book page
   // In that case, we should click on the top result
   // Below we check if we are looking at a search results page
+  
   console.log("Checking if we landed on search results...");
   let searchResultItem = page.locator('li[data-testid="search-result-item"');
-  if(searchResultItem) return true;
+  if(searchResultItem) {
+    console.log("Landed on search results page. Waiting for search results to appear...");
+    return true;
+  }
+  console.log("Not on search results page. Continuing on...");
   return false;
 }
 
 
 async function goToFirstSearchResult(){
-  console.log("Landed on search results page. Waiting for search results to appear...");
-
   try {
     let successfullyClicked = await waitForElementToAppearAndClick('h2 > div > a');
     if(!successfullyClicked) {
