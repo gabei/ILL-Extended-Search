@@ -17,14 +17,14 @@ app.listen(port || 8000, () => {
   console.log("App listening on port " + port);
 })
 
+app.use((err, req, res, next) => {
+    console.log("Error caught in middleware");
+    console.error(err.stack);
+    res.status(500).json("Something went wrong. Double check the supplied lookup code and try again.");
+});
 
-app.get("/search", async (req, res)=> {
-  try {
-    const ISBN = req.query.code
-    let libraryList = await initWorldcat(ISBN);
-    res.json(libraryList);
-  } catch(error) {
-    res.status(500).send("Something went wrong. Double check the supplied lookup code and try again.");
-  }
-  
+app.get("/search", async (req, res, next)=> {
+  const ISBN = req.query.code
+  let libraryList = await initWorldcat(ISBN);
+  res.json(libraryList);
 });
