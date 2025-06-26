@@ -71,14 +71,6 @@ const removeDuplicateEntries = (list1, list2) => {
 }
 
 
-const printMatchList = (matches) => {
-  console.log("Matches found: " + matches);
-  for(let match of matches) {
-    console.log(match)
-  }
-}
-
-
 export default async function initFuzzysearch(searchableLibraries){
   let texasLenderList = createLenderCodeDict(TXlenders);
   let allLenderList = createLenderCodeDict(ALLlenders);
