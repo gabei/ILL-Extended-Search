@@ -162,11 +162,12 @@ async function scrapeForBookData(){
     let author = document.querySelector('a[data-testid^="author-"]');
     let isbn = document.querySelector('span[aria-labelledby^="isbn-"] > div > span');
     let oclc = document.querySelector('span[aria-labelledby^="oclcnumber-"]');
-    let publisher = document.querySelector('span[data-testid^="publisher-"]')
+    let publisher = document.querySelector('span[data-testid^="publisher-"]');
+    let itemContainsISBN = isbn && isbn !== null && isbn !== undefined;
     return {
       title: title.innerText.trim(),
       author: author.innerText.trim(),
-      isbn: isbn.innerText.trim(),
+      ...(itemContainsISBN && {isbn: isbn.innerText.trim()}),
       oclc: oclc.innerText.trim(),
       publisher: publisher.innerText.trim(),
     }
@@ -198,10 +199,11 @@ async function handleLibraryLoadError(){
   let errorDivSelector = 'div[data-testid="holdings-error-notification-message"]';
   let errorMessageButton = page.locator('div[data-testid="holdings-error-notification-message"] button');
   let errorShows = await elementExists(errorDivSelector);
-  let clickErrorMessageButton = await waitForElementToAppearAndClick(errorMessageButton);
-
+  
   // If the library holdings list fails to load, we need to tell the page to reload
+  // This would most likely represent a problem with login timing out
   if ( errorShows ) {
+      let clickErrorMessageButton = await waitForElementToAppearAndClick(errorMessageButton);
       await clickErrorMessageButton();
       await waitFor(2000);
 
