@@ -157,6 +157,7 @@ async function inputLoginCredentials(){
 }
 
 async function scrapeForBookData(){
+  await page.waitForSelector('h1 > div > span', { timeout: 5000 })
   let bookData =  await page.evaluate(async () => {
     let pageElements = {
       title: document.querySelector('h1 > div > span'),
@@ -169,11 +170,7 @@ async function scrapeForBookData(){
     let strippedData = {};
     Object.keys(pageElements).forEach((key) => {
       let element = pageElements[key];
-      if(!element || element === null || element === undefined){
-        strippedData[key] = "Not found";
-      } else {
-        strippedData[key] = element.innerText.trim();
-      }
+      strippedData[key] = element ? element.innerText.trim() : "Not found";
     });
     return strippedData;
   })
