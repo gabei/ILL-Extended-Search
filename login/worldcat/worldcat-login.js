@@ -158,25 +158,29 @@ async function inputLoginCredentials(){
 
 async function scrapeForBookData(){
   let bookData =  await page.evaluate(async () => {
-    let title = document.querySelector('h1 > div > span');
-    let author = document.querySelector('a[data-testid^="author-"]');
-    let isbn = document.querySelector('span[aria-labelledby^="isbn-"] > div > span');
-    let oclc = document.querySelector('span[aria-labelledby^="oclcnumber-"]');
-    let publisher = document.querySelector('span[data-testid^="publisher-"]');
-    let itemContainsISBN = isbn && isbn !== null && isbn !== undefined;
-    return {
-      title: title.innerText.trim(),
-      author: author.innerText.trim(),
-      ...(itemContainsISBN && {isbn: isbn.innerText.trim()}),
-      oclc: oclc.innerText.trim(),
-      publisher: publisher.innerText.trim(),
+    let pageElements = {
+      title: document.querySelector('h1 > div > span'),
+      author: document.querySelector('a[data-testid^="author-"]'),
+      isbn: document.querySelector('span[aria-labelledby^="isbn-"] > div > span'),
+      oclc: document.querySelector('span[aria-labelledby^="oclcnumber-"]'),
+      publisher: document.querySelector('span[data-testid^="publisher-"]'),
     }
-  });
 
+    let strippedData = {};
+    Object.keys(pageElements).forEach((key) => {
+      let element = pageElements[key];
+      if(!element || element === null || element === undefined){
+        strippedData[key] = "Not found";
+      } else {
+        strippedData[key] = element.innerText.trim();
+      }
+    });
+    return strippedData;
+  })
   let lenderData = await scrapeForLenderData();
+  console.log("bookData: ", bookData);
   return {...bookData, lenderData}
 }
-
 
 async function scrapeForLenderData(){
     let libraryNames = await attemptToGetLibraryHoldingsList();
