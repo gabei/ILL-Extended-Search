@@ -23,6 +23,10 @@ app.use((err, req, res, next) => {
     res.status(500).json("Something went wrong. Double check the supplied lookup code and try again.");
 });
 
+app.get("/", async (req, res, next) => {
+  res.redirect("/search");
+})
+
 app.get("/search", async (req, res, next)=> {
   const ISBN = req.query.code
   let libraryList = await initWorldcat(ISBN);
