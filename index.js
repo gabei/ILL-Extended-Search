@@ -8,8 +8,11 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT;
 
-
-app.use(cors());
+const corsOptions = {
+  origin: ['https://gabei.github.io', 'http://gabei.github.io'],
+  methods: ['GET', 'POST'],
+}
+app.use(cors(corsOptions));
 app.use(express.json());
 
 
