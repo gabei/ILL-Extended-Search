@@ -3,6 +3,8 @@ import { worldCatConfig as config } from '../config.js';
 import { elementExists, waitFor } from '../general/general.js';
 import initFuzzysearch from '../../tools/fuzzy_search_js/fuzzySearch.js';
 
+console.log(config);
+
 
 
 let cookiesRejected = false;
