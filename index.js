@@ -9,7 +9,10 @@ const app = express();
 const port = process.env.PORT;
 
 const corsOptions = {
-  origin: ['https://gabei.github.io', 'http://gabei.github.io'],
+  origin: ['https://gabei.github.io/LTCL-client/',
+    'http://gabei.github.io/LTCL-client/',
+  'https://gabei.github.io',
+  'http://gabei.github.io'],
   methods: ['GET', 'POST'],
 }
 app.use(cors(corsOptions));
