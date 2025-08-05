@@ -206,8 +206,8 @@ async function handleLibraryLoadError(){
   // If the library holdings list fails to load, we need to tell the page to reload
   // This would most likely represent a problem with login timing out
   if ( errorShows ) {
-      let clickErrorMessageButton = await waitForElementToAppearAndClick(errorMessageButton);
-      await clickErrorMessageButton();
+      await waitForElementToAppearAndClick(errorMessageButton);
+      console.log("Error message shown for library holdings list. Attempting to reload the page...");
       await waitFor(2000);
 
       if( errorShows ){
