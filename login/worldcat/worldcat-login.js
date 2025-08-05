@@ -238,7 +238,7 @@ async function expandLibraryHoldingsList(){
 }
 
 
-async function waitForElementToAppearAndClick(selector, maxWaitTime = 10000) {
+async function waitForElementToAppearAndClick(selector, maxWaitTime = 30000) {
   // See documentation for waitForFunction:
   // https://pptr.dev/api/puppeteer.page.waitforfunction
 
