@@ -7,7 +7,7 @@ const browser = await puppeteer.launch(browserOptions);
 
 
 let page = await browser.newPage()
-  page.setDefaultNavigationTimeout(20000); // 3 minutes
+  page.setDefaultNavigationTimeout(120000); // 2 minutes
   page.setCacheEnabled(false);
   page.setUserAgent(await getRandomUserAgent());
 
