@@ -18,7 +18,7 @@ const port = process.env.PORT;
 // app.use(cors(corsOptions));
 
 
-app.use(req, res, next => {
+app.use((req, res, next) => {
   // try set CORS headers manually isntead of using the cors package
   // a la this post: https://stackoverflow.com/questions/72166644/node-and-heroku-error-no-access-control-allow-origin-header-is-present-on-th
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -36,16 +36,16 @@ app.listen(port || 8000, () => {
 })
 
 app.use((err, req, res, next) => {
-    console.log("Error caught in middleware");
-    console.error(err.stack);
-    res.status(500).json("Something went wrong. Double check the supplied lookup code and try again.");
+  console.log("Error caught in middleware");
+  console.error(err.stack);
+  res.status(500).json("Something went wrong. Double check the supplied lookup code and try again.");
 });
 
 app.get("/", async (req, res, next) => {
   res.redirect("/search");
 })
 
-app.get("/search", async (req, res, next)=> {
+app.get("/search", async (req, res, next) => {
   const ISBN = req.query.code
   let libraryList = await initWorldcat(ISBN);
   res.json(libraryList);
