@@ -46,6 +46,9 @@ app.get("/", async (req, res, next) => {
 })
 
 app.get("/search", async (req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET");
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested, Content-Type, Accept Authorization");
   const ISBN = req.query.code
   let libraryList = await initWorldcat(ISBN);
   res.json(libraryList);
