@@ -174,14 +174,12 @@ async function scrapeForBookData(){
     return strippedData;
   })
   let lenderData = await scrapeForLenderData();
-  console.log("bookData: ", bookData);
   return {...bookData, lenderData}
 }
 
 async function scrapeForLenderData(){
     let libraryNames = await attemptToGetLibraryHoldingsList();
     let libraryCodes = await initFuzzysearch(libraryNames);
-    console.log(libraryCodes);
     return libraryCodes;
 }
 
