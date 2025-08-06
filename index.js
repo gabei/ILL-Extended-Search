@@ -10,15 +10,13 @@ const port = process.env.PORT;
 
 
 app.use((req, res, next) => {
-  // try set CORS headers manually isntead of using the cors package
-  // a la this post: https://stackoverflow.com/questions/72166644/node-and-heroku-error-no-access-control-allow-origin-header-is-present-on-th
-  
-  res.set(
-    "access-control-allow-origin",
-    ['https://gabei.github.io','http://gabei.github.io/LTCL-client/'],
-    "Access-Control-Allow-Methods", "GET",
-    "Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
+  // Set CORS headers manually
+  res.set({
+    "Access-Control-Allow-Origin": ['https://gabei.github.io','http://gabei.github.io/LTCL-client/'],
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept",
+    "Access-Control-Allow-Methods": "GET"
+  })
   next();
 });
 
