@@ -1,7 +1,6 @@
 import initWorldcat from './login/worldcat/worldcat-login.js';
 import express from 'express';
 import dotenv from 'dotenv';
-import cors from "cors";
 dotenv.config();
 
 
@@ -12,7 +11,7 @@ const port = process.env.PORT;
 app.use((req, res, next) => {
   // Set CORS headers manually
   res.set({
-    "Access-Control-Allow-Origin": 'https://gabei.github.io/LTCL-client',
+    "Access-Control-Allow-Origin": 'https://gabei.github.io',
     "Access-Control-Allow-Credentials": "true",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept",
     "Access-Control-Allow-Methods": "GET"
