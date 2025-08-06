@@ -174,6 +174,7 @@ async function scrapeForBookData(){
     return strippedData;
   })
   let lenderData = await scrapeForLenderData();
+
   return {...bookData, lenderData}
 }
 
