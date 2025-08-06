@@ -116,7 +116,6 @@ async function goToFirstSearchResult(){
 async function attemptToLogin(){
   try {
     await goToSignInPage();
-    //await page.waitForNavigation();
     await inputEmail();
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     await inputLoginCredentials();
