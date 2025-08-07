@@ -28,9 +28,6 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 
-app.listen(port || 8000, () => {
-  console.log("App listening on port " + port);
-})
 
 app.use((err, req, res, next) => {
   console.log("Error caught in middleware");
@@ -47,3 +44,7 @@ app.get("/search", async (req, res, next) => {
   let libraryList = await initWorldcat(ISBN);
   res.json(libraryList);
 });
+
+app.listen(port || 8000, () => {
+  console.log("App listening on port " + port);
+})
