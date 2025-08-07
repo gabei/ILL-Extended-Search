@@ -8,16 +8,16 @@ const app = express();
 const port = process.env.PORT;
 
 
-app.use((req, res, next) => {
-  // Set CORS headers manually
-  res.set({
-    "Access-Control-Allow-Origin": 'https://gabei.github.io',
-    "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept",
-    "Access-Control-Allow-Methods": "GET"
-  })
-  next();
-});
+// app.use((req, res, next) => {
+//   // Set CORS headers manually
+//   res.set({
+//     "Access-Control-Allow-Origin": 'https://gabei.github.io',
+//     "Access-Control-Allow-Credentials": "true",
+//     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept",
+//     "Access-Control-Allow-Methods": "GET"
+//   })
+//   next();
+// });
 
 app.use((req, res, next) => {
   console.log("New request received at " + new Date().toISOString());
